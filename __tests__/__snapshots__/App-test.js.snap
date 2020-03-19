@@ -1,14 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`App renders the loading screen 1`] = `
-<AppLoading
-  onError={[Function]}
-  onFinish={[Function]}
-  startAsync={[Function]}
-/>
-`;
-
-exports[`App renders the root without loading screen 1`] = `
+exports[`renders correctly 1`] = `
 <View
   style={
     Object {
@@ -17,6 +9,45 @@ exports[`App renders the root without loading screen 1`] = `
     }
   }
 >
-  <AppNavigator />
+  <RCTScrollView
+    collapsable={false}
+    contentContainerStyle={
+      Object {
+        "paddingTop": 30,
+      }
+    }
+    onGestureHandlerEvent={[Function]}
+    onGestureHandlerStateChange={[Function]}
+    style={
+      Object {
+        "backgroundColor": "#fff",
+        "flex": 1,
+      }
+    }
+  >
+    <View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "marginHorizontal": 50,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "rgba(96,100,109, 1)",
+              "fontSize": 17,
+              "lineHeight": 24,
+              "textAlign": "center",
+            }
+          }
+        >
+          Welcome! This is Bill Splitter. A quick way to split the bill among friends.
+        </Text>
+      </View>
+    </View>
+  </RCTScrollView>
 </View>
 `;

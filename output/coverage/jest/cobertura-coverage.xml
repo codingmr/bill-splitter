@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
+<coverage lines-valid="4" lines-covered="4" line-rate="1" branches-valid="0" branches-covered="0" branch-rate="1" timestamp="1584630493704" complexity="0" version="0.1">
+  <sources>
+    <source>/home/memroberts/Documents/workzone/bill-splitter</source>
+  </sources>
+  <packages>
+    <package name="components" line-rate="1" branch-rate="1">
+      <classes>
+        <class name="StyledText.js" filename="components/StyledText.js" line-rate="1" branch-rate="1">
+          <methods>
+            <method name="MonoText" hits="1" signature="()V">
+              <lines>
+                <line number="4" hits="1"/>
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="5" hits="1" branch="false"/>
+          </lines>
+        </class>
+      </classes>
+    </package>
+    <package name="screens" line-rate="1" branch-rate="1">
+      <classes>
+        <class name="HomeScreen.js" filename="screens/HomeScreen.js" line-rate="1" branch-rate="1">
+          <methods>
+            <method name="HomeScreen" hits="1" signature="()V">
+              <lines>
+                <line number="8" hits="1"/>
+              </lines>
+            </method>
+            <method name="handleExample" hits="0" signature="()V">
+              <lines>
+                <line number="28" hits="0"/>
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="9" hits="1" branch="false"/>
+            <line number="24" hits="1" branch="false"/>
+            <line number="32" hits="1" branch="false"/>
+          </lines>
+        </class>
+      </classes>
+    </package>
+  </packages>
+</coverage>

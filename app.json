@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Tab Navigation Template",
+    "name": "Bill Splitter",
     "slug": "bill-splitter",
     "privacy": "public",
     "sdkVersion": "36.0.0",
@@ -9,6 +9,10 @@
       "android",
       "web"
     ],
+    "android": {
+      "package": "com.codingmroberts.billsplitter",
+      "versionCode": 1
+    },
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
