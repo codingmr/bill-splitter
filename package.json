@@ -6,7 +6,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "test watch": "jest --watchAll",
+    "test-watch": "jest --watchAll",
+    "test-update": "npm test -- -u",
     "test": "jest --coverage --coverageDirectory=output/coverage/jest"
   },
   "jest": {
