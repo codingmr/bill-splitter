@@ -3,9 +3,26 @@ import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react
 import { ScrollView } from 'react-native-gesture-handler';
 import * as WebBrowser from 'expo-web-browser';
 
+import { ListItem } from 'react-native-elements';
+
+import { Icon } from 'react-native-elements'
+
+
 import { MonoText } from '../components/StyledText';
 
+const list = [
+  {
+    title: 'Group 1',
+    icon: 'delete'
+  },
+  {
+    title: 'Group 2',
+    icon: 'delete'
+  },
+]
+
 export default function HomeScreen() {
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -16,7 +33,34 @@ export default function HomeScreen() {
             Welcome! This is Bill Splitter. A quick way to split the bill among friends.
           </Text>
         </View>
+
+        <View>
+          {
+            list.map((item, i) => (
+              <ListItem
+                key={i}
+                title={item.title}
+                leftIcon={{ name: item.icon }}
+                bottomDivider
+                chevron
+              />
+            ))
+          }
+        </View>
+
+        <View style={styles.addGroupContainer}>
+        <Icon
+          raised
+          name='plus'
+          type='font-awesome'
+          color='#a3c1ad'
+          onPress={() => console.log('toggle add-circle-outline to add-circle-filed')} />
+        </View>
+
       </ScrollView>
+
+
+
     </View>
   );
 }
@@ -33,6 +77,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  addGroupContainer:{
+    paddingTop: 5,
+    alignItems: 'center',
   },
   developmentModeText: {
     marginBottom: 20,
