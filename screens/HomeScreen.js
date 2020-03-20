@@ -16,38 +16,37 @@ export default class HomeScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    this.array = [],
+    this.array = []
 
     this.state = {
       arrayHolder: [],
       textInput_Holder: '',
-      count: 1
+      count: 3,
+      User: [
+        {
+          name: 'Group 1',
+          age: 10,
+        },
+        {
+          name: 'Group 2',
+          age: 20,
+        }
+      ]
     }
 
   }
 
-  componentDidMount() {
-
-    this.setState({ arrayHolder: [...this.array] })
-
-  }
-
-
   joinData = () => {
-
     this.setState({'count': this.state.count + 1})
 
-    this.array.push({title : "Group " + this.state.count});
-
-    this.setState({ arrayHolder: [...this.array] })
-
+    this.setState({ User: [...this.state.User, ...[{name: 'Group ' + this.state.count, age: '34'}]] })
   }
 
   FlatListItemSeparator = () => {
     return (
       <View
         style={{
-          height: 1,
+          height: 10,
           width: "100%",
           backgroundColor: "#607D8B",
         }}
@@ -61,6 +60,14 @@ export default class HomeScreen extends React.Component {
 
   }
 
+  renderGroupItem = ({item}) => {
+    return (
+      <View>
+        <Text style={styles.item} onPress={this.GetItem.bind(this, item.name)}> {item.name} </Text>
+        <Text>{item.age}</Text>
+      </View>
+    )
+  }
 
   render() {
     return (
@@ -76,7 +83,7 @@ export default class HomeScreen extends React.Component {
 
           <FlatList
 
-            data={this.state.arrayHolder}
+            data={this.state.User}
 
             width='100%'
 
@@ -86,7 +93,7 @@ export default class HomeScreen extends React.Component {
 
             ItemSeparatorComponent={this.FlatListItemSeparator}
 
-            renderItem={({ item }) => <Text style={styles.item} onPress={this.GetItem.bind(this, item.title)} > {item.title} </Text>}
+            renderItem = {this.renderGroupItem}
           />
 
           <View style={styles.addGroupContainer}>
