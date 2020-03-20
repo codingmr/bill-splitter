@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { Image, FlatList, Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, FlatList, Alert, Platform, ListItem, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as WebBrowser from 'expo-web-browser';
 
-import { ListItem } from 'react-native-elements';
 
 import { Icon } from 'react-native-elements'
 
@@ -16,20 +15,18 @@ export default class HomeScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    this.array = []
 
     this.state = {
-      arrayHolder: [],
       textInput_Holder: '',
       count: 3,
-      User: [
+      Group: [
         {
-          name: 'Group 1',
-          age: 10,
+          title: 'Group 1',
+          billItem: [{itemAmount: 1.20, itemIcon: 'a'}, {itemAmount: 3.50, itemIcon: 'b'}],
         },
         {
-          name: 'Group 2',
-          age: 20,
+          title: 'Group 2',
+          billItem: [{itemAmount: 1.20, itemIcon: 'a'}, {itemAmount: 3.50, itemIcon: 'b'}],
         }
       ]
     }
@@ -39,7 +36,7 @@ export default class HomeScreen extends React.Component {
   joinData = () => {
     this.setState({'count': this.state.count + 1})
 
-    this.setState({ User: [...this.state.User, ...[{name: 'Group ' + this.state.count, age: '34'}]] })
+    this.setState({ Group: [...this.state.Group, ...[{title: 'Group ' + this.state.count, billItem: []}]] })
   }
 
   FlatListItemSeparator = () => {
@@ -63,8 +60,13 @@ export default class HomeScreen extends React.Component {
   renderGroupItem = ({item}) => {
     return (
       <View>
-        <Text style={styles.item} onPress={this.GetItem.bind(this, item.name)}> {item.name} </Text>
-        <Text>{item.age}</Text>
+        <Text style={styles.item} onPress={this.GetItem.bind(this, item.title)}> {item.title} </Text>
+
+        <FlatList
+            data={item.billItem}
+            renderItem = {({ item }) => <View><Text>{item.itemAmount}</Text></View>}
+            listKey={(item, index) => 'D' + index.toString()}
+        />
       </View>
     )
   }
@@ -82,17 +84,10 @@ export default class HomeScreen extends React.Component {
           </View>
 
           <FlatList
-
-            data={this.state.User}
-
+            data={this.state.Group}
             width='100%'
-
-            extraData={this.state.arrayHolder}
-
-            keyExtractor={(item, index) => item.key}
-
+            listKey={(item, index) => 'D' + index.toString()}
             ItemSeparatorComponent={this.FlatListItemSeparator}
-
             renderItem = {this.renderGroupItem}
           />
 
