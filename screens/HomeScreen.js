@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { Component } from 'react';
+import { Image, FlatList, Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as WebBrowser from 'expo-web-browser';
 
@@ -10,59 +10,102 @@ import { Icon } from 'react-native-elements'
 
 import { MonoText } from '../components/StyledText';
 
-const list = [
-  {
-    title: 'Group 1',
-    icon: 'delete'
-  },
-  {
-    title: 'Group 2',
-    icon: 'delete'
-  },
-]
+import GroupList from '../components/GroupList';
 
-export default function HomeScreen() {
+export default class HomeScreen extends React.Component {
 
-  return (
-    <View style={styles.container}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+  constructor(props) {
+    super(props);
+    this.array = [],
 
-        <View style={styles.getStartedContainer}>
+    this.state = {
+      arrayHolder: [],
+      textInput_Holder: '',
+      count: 1
+    }
 
-          <Text style={styles.getStartedText}>
-            Welcome! This is Bill Splitter. A quick way to split the bill among friends.
-          </Text>
-        </View>
+  }
 
-        <View>
-          {
-            list.map((item, i) => (
-              <ListItem
-                key={i}
-                title={item.title}
-                leftIcon={{ name: item.icon }}
-                bottomDivider
-                chevron
-              />
-            ))
-          }
-        </View>
+  componentDidMount() {
 
-        <View style={styles.addGroupContainer}>
-        <Icon
-          raised
-          name='plus'
-          type='font-awesome'
-          color='#a3c1ad'
-          onPress={() => console.log('toggle add-circle-outline to add-circle-filed')} />
-        </View>
+    this.setState({ arrayHolder: [...this.array] })
 
-      </ScrollView>
+  }
 
 
+  joinData = () => {
 
-    </View>
-  );
+    this.setState({'count': this.state.count + 1})
+
+    this.array.push({title : "Group " + this.state.count});
+
+    this.setState({ arrayHolder: [...this.array] })
+
+  }
+
+  FlatListItemSeparator = () => {
+    return (
+      <View
+        style={{
+          height: 1,
+          width: "100%",
+          backgroundColor: "#607D8B",
+        }}
+      />
+    );
+  }
+
+  GetItem(item) {
+
+    Alert.alert(item);
+
+  }
+
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+
+          <View style={styles.getStartedContainer}>
+
+            <Text style={styles.getStartedText}>
+              Welcome! This is Bill Splitter. A quick way to split the bill among friends.
+            </Text>
+          </View>
+
+          <FlatList
+
+            data={this.state.arrayHolder}
+
+            width='100%'
+
+            extraData={this.state.arrayHolder}
+
+            keyExtractor={(item, index) => item.key}
+
+            ItemSeparatorComponent={this.FlatListItemSeparator}
+
+            renderItem={({ item }) => <Text style={styles.item} onPress={this.GetItem.bind(this, item.title)} > {item.title} </Text>}
+          />
+
+          <View style={styles.addGroupContainer}>
+
+            <Icon
+              raised
+              name='plus'
+              type='font-awesome'
+              color='#a3c1ad'
+              onPress={this.joinData} />
+          </View>
+
+        </ScrollView>
+
+
+
+      </View>
+    );
+  }
 }
 
 HomeScreen.navigationOptions = {
