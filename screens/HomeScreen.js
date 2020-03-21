@@ -4,7 +4,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import * as WebBrowser from 'expo-web-browser';
 
 
-import { Icon } from 'react-native-elements'
+import { Icon, Input } from 'react-native-elements'
 
 
 import { MonoText } from '../components/StyledText';
@@ -22,11 +22,11 @@ export default class HomeScreen extends React.Component {
       Group: [
         {
           title: 'Group 1',
-          billItem: [{itemAmount: 1.20, itemIcon: 'a'}, {itemAmount: 3.50, itemIcon: 'b'}],
+          billItem: [{itemAmount: '£1.20', itemIcon: 'restaurant'}, {itemAmount: '£3.50', itemIcon: 'restaurant'}],
         },
         {
           title: 'Group 2',
-          billItem: [{itemAmount: 1.20, itemIcon: 'a'}, {itemAmount: 3.50, itemIcon: 'b'}],
+          billItem: [{itemAmount: '£10.20', itemIcon: 'restaurant'}, {itemAmount: '£2.99', itemIcon: 'restaurant'}],
         }
       ]
     }
@@ -36,16 +36,15 @@ export default class HomeScreen extends React.Component {
   joinData = () => {
     this.setState({'count': this.state.count + 1})
 
-    this.setState({ Group: [...this.state.Group, ...[{title: 'Group ' + this.state.count, billItem: []}]] })
+    this.setState({ Group: [...this.state.Group, ...[{title: 'Group ' + this.state.count, billItem: [{itemAmount: '£0.00', itemIcon: 'restaurant'}]}]] })
   }
 
   FlatListItemSeparator = () => {
     return (
       <View
         style={{
-          height: 10,
+          height: 20,
           width: "100%",
-          backgroundColor: "#607D8B",
         }}
       />
     );
@@ -60,11 +59,25 @@ export default class HomeScreen extends React.Component {
   renderGroupItem = ({item}) => {
     return (
       <View>
-        <Text style={styles.item} onPress={this.GetItem.bind(this, item.title)}> {item.title} </Text>
-
+        <View style={styles.itemBox}>
+          <Text style={styles.itemTitle} onPress={this.GetItem.bind(this, item.title)}> {item.title} </Text>
+        </View>
         <FlatList
             data={item.billItem}
-            renderItem = {({ item }) => <View><Text>{item.itemAmount}</Text></View>}
+            renderItem = {({ item }) => <View style={styles.groupBox}>
+                                          <View style={styles.inlineContainer}>
+                                            <Input
+                                              placeholder={item.itemAmount}
+                                              inputStyle={styles.itemAmountBox}
+                                            />
+                                            <Icon
+                                              name={item.itemIcon}
+                                              type='Ionicon'
+                                              iconStyle={styles.itemIconBox}
+                                            />
+                                          </View>
+                                        </View>}
+
             listKey={(item, index) => 'D' + index.toString()}
         />
       </View>
@@ -133,6 +146,34 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 19,
     textAlign: 'center',
+  },
+  groupBox: {
+    backgroundColor: 'blue',
+    width: '80%',
+    alignSelf: 'center',
+    marginBottom: 10,
+  },
+  inlineContainer: {
+    backgroundColor: 'red',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 50,
+    paddingTop: 5,
+    marginBottom: 5,
+  },
+  itemBox: {
+    width: '80%',
+    alignSelf: 'center',
+    backgroundColor: 'green',
+    alignItems: 'center',
+  },
+  itemTitle: {
+    fontSize: 24,
+  },
+  itemIconBox: {
+    marginTop: 12,
+  },
+  itemAmountBox: {
   },
   contentContainer: {
     paddingTop: 30,
