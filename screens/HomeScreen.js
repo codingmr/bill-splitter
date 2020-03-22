@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, FlatList, Alert, Platform, ListItem, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, TVEventHandler, FlatList, Alert, Platform, ListItem, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as WebBrowser from 'expo-web-browser';
 
@@ -19,35 +19,79 @@ export default class HomeScreen extends React.Component {
     this.state = {
       textInput_Holder: '',
       count: 3,
+      billTotal: 0.00,
+      selectedGroupIndex: 0,
       Group: [
         {
+          key: 0,
           title: 'Group 1',
-          billItem: [{itemAmount: '£1.20', itemIcon: 'restaurant'}, {itemAmount: '£3.50', itemIcon: 'restaurant'}],
+          billItem: [{itemAmount: '1.20', itemIcon: 'restaurant'}, {itemAmount: '3.50', itemIcon: 'restaurant'}],
         },
         {
+          key: 1,
           title: 'Group 2',
-          billItem: [{itemAmount: '£10.20', itemIcon: 'restaurant'}, {itemAmount: '£2.99', itemIcon: 'restaurant'}],
+          billItem: [{itemAmount: '10.20', itemIcon: 'restaurant'}, {itemAmount: '2.99', itemIcon: 'restaurant'}, {itemAmount: '2.99', itemIcon: 'restaurant'}],
         }
-      ]
+      ],
     }
 
   }
 
   joinData = () => {
-    this.setState({'count': this.state.count + 1})
+    // TODO: scroll screen to bottom
 
-    this.setState({ Group: [...this.state.Group, ...[{title: 'Group ' + this.state.count, billItem: [{itemAmount: '£0.00', itemIcon: 'restaurant'}]}]] })
+    this.setState({count: this.state.count + 1})
+
+    this.setState({ Group: [...this.state.Group, ...[{key: this.state.count-1, title: 'Group ' + this.state.count, billItem: [{itemAmount: '£0.00', itemIcon: 'restaurant'}]}]] })
+    this.ListView_Ref.scrollToEnd({ animated: true });
   }
 
   FlatListItemSeparator = () => {
     return (
       <View
         style={{
-          height: 20,
+          height: 0,
           width: "100%",
         }}
       />
     );
+  }
+
+  handleOnChangeText = () => {
+    //console.log("onChangeText: True")
+    //console.log(value)
+    // TODO: sum a groups bills into one
+    // TODO: sum all bills into one
+    // TODO: update state for total bill and group x bill
+
+    let output2 = this.state.Group.map(d=>({
+      groupTitle : d.title,
+      groupTotal : d.billItem.reduce((a,b)=>parseFloat(a.itemAmount)+parseFloat(b.itemAmount))
+    }));
+
+    console.log(output2)
+    console.log(output2[this.state.selectedGroupIndex].groupTitle);
+
+    let initialValue = 0
+    let sum = [{x: 1}, {x: 2}, {x: 3}].reduce(function (accumulator, currentValue) {
+        return accumulator + currentValue.x
+    }, initialValue)
+
+    console.log(sum) // logs 6
+
+    //console.log(JSON.stringify(this.state.Group[0].billItem))
+    //this.setState({billTotal: this.state.Group[0].billItem})
+  }
+
+  handleFocus = item => {
+    console.log("onFocus: True")
+    // TODO: get selected index
+    // TODO: update state of selected index
+    //console.log(!item.isSelect)
+    //console.log(item.title)
+    //console.log(item.key)
+    this.setState({selectedGroupIndex: item.key})
+
   }
 
   GetItem(item) {
@@ -56,19 +100,23 @@ export default class HomeScreen extends React.Component {
 
   }
 
-  renderGroupItem = ({item}) => {
+  renderGroupItem = ({item, index}) => {
     return (
       <View>
         <View style={styles.itemBox}>
           <Text style={styles.itemTitle} onPress={this.GetItem.bind(this, item.title)}> {item.title} </Text>
         </View>
+
         <FlatList
+            onFocus={() => this.handleFocus(item)}
             data={item.billItem}
-            renderItem = {({ item }) => <View style={styles.groupBox}>
+            renderItem = {({ item, index }) => <View style={styles.groupBox}>
                                           <View style={styles.inlineContainer}>
                                             <Input
                                               placeholder={item.itemAmount}
                                               inputStyle={styles.itemAmountBox}
+                                              keyboardType='numeric'
+                                              onChangeText={this.handleOnChangeText}
                                             />
                                             <Icon
                                               name={item.itemIcon}
@@ -77,8 +125,8 @@ export default class HomeScreen extends React.Component {
                                             />
                                           </View>
                                         </View>}
-
-            listKey={(item, index) => 'D' + index.toString()}
+            keyExtractor={item => item.key}
+            listKey={(item, index) => 'A' + index.toString()}
         />
       </View>
     )
@@ -87,38 +135,33 @@ export default class HomeScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
-          <View style={styles.getStartedContainer}>
-
-            <Text style={styles.getStartedText}>
-              Welcome! This is Bill Splitter. A quick way to split the bill among friends.
-            </Text>
-          </View>
-
-          <FlatList
+          <FlatList keyboardDismissMode='on-drag'
             data={this.state.Group}
             width='100%'
-            listKey={(item, index) => 'D' + index.toString()}
+
+            ref={(ref) => {
+              this.ListView_Ref = ref;
+            }}
+
             ItemSeparatorComponent={this.FlatListItemSeparator}
+            keyExtractor={item => item.id}
             renderItem = {this.renderGroupItem}
+            extraData={this.state}
+            ListFooterComponent={<View style={styles.addGroupContainer}><Icon
+                                    raised
+                                    name='plus'
+                                    type='font-awesome'
+                                    color='#a3c1ad'
+                                    onPress={this.joinData}
+                                  /></View>
+                                }
           />
-
-          <View style={styles.addGroupContainer}>
-
-            <Icon
-              raised
-              name='plus'
-              type='font-awesome'
-              color='#a3c1ad'
-              onPress={this.joinData} />
+          <View style={styles.billTotalFooter}>
+            <Text>Total: £{this.state.billTotal}</Text>
           </View>
-
-        </ScrollView>
-
-
-
       </View>
+
     );
   }
 }
@@ -131,14 +174,20 @@ function handleExample() {
   //do something
 };
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
   },
+  billTotalFooter: {
+    fontSize: 20,
+    alignItems: 'center',
+  },
   addGroupContainer:{
     paddingTop: 5,
     alignItems: 'center',
+    marginBottom: 300,
   },
   developmentModeText: {
     marginBottom: 20,
