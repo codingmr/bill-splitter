@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 
-export default function LinksScreen() {
+export default function HistoryScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <OptionButton
@@ -37,7 +37,9 @@ function OptionButton({ icon, label, onPress, isLastOption }) {
     </RectButton>
   );
 }
-
+HistoryScreen.navigationOptions = {
+  header: null,
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,
