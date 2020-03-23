@@ -4,13 +4,17 @@ import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 
-export default function LinksScreen() {
+export default function SettingsScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
     </ScrollView>
   );
 }
+
+SettingsScreen.navigationOptions = {
+  header: null,
+};
 
 const styles = StyleSheet.create({
   container: {

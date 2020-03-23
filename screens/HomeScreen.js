@@ -12,7 +12,13 @@ import { MonoText } from '../components/StyledText';
 import GroupList from '../components/GroupList';
 
 export default class HomeScreen extends React.Component {
-
+  static navigationOptions = {
+    headerShown: false,
+    header: {
+      visible: false,
+    },
+    visible: false,
+  };
   constructor(props) {
     super(props);
 
@@ -28,11 +34,13 @@ export default class HomeScreen extends React.Component {
           key: 0,
           title: 'Group 1',
           billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}, {id: 1, itemAmount: '0.00', itemIcon: 'restaurant'}],
+          billTotal: 0,
         },
         {
           key: 1,
           title: 'Group 2',
           billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}, {id: 1, itemAmount: '0.00', itemIcon: 'restaurant'}, {id: 2, itemAmount: '0.00', itemIcon: 'restaurant'}],
+          billTotal: 0,
         }
       ],
     }
@@ -44,9 +52,10 @@ export default class HomeScreen extends React.Component {
 
     this.setState({count: this.state.count + 1})
 
-    this.setState({ Group: [...this.state.Group, ...[{key: this.state.count-1, title: 'Group ' + this.state.count, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] })
+    this.setState({ Group: [...this.state.Group, ...[{key: this.state.count-1, title: 'Group ' + this.state.count, billTotal: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] })
     this.ListView_Ref.scrollToEnd({ animated: true });
   }
+
 
   FlatListItemSeparator = () => {
     return (
@@ -59,59 +68,58 @@ export default class HomeScreen extends React.Component {
     );
   }
 
-  handleOnChangeText = (value) => {
-    //console.log("onChangeText: True")
-    //console.log(value)
-    // TODO: sum a groups bills into one
-    // TODO: sum all bills into one
-    // TODO: update state for total bill and group x bill
-
-
-    //console.log(value)
-    //TODO: get the text box index
-    //this.setState({Group: '5'})
-
-    let groupies = [...this.state.Group]
-    let groupIdx = this.state.selectedGroupIndex
-    let itemIdx = this.state.selectedItemIndex
-    //console.log("Group index: " + groupIdx)
-    //console.log("Item index: " + itemIdx)
-    //this.setState({textHolder: value})
-
-    groupies[groupIdx] = {...groupies[groupIdx], title: 'Group 666'}
-
-    //console.log(value)
-    let itemies = [...groupies[groupIdx].billItem]
-    itemies[itemIdx] = {...itemies[itemIdx], itemAmount: value}
-
-
-    //console.log(groupies)
-
-    groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
-    //console.log(groupies)
-
-    //console.log(itemies)
-
-    this.setState({Group: groupies })
-
-    let output3 = this.state.Group.map(x => ({
-      groupTitle: x.title,
-      groupKeyTot: x.billItem.reduce(function (accumulator, currentValue) {
-        return parseFloat(accumulator) + parseFloat(currentValue.itemAmount)
-      }, 0)
-    }));
-
-    //console.log(JSON.stringify(this.state.Group))
-    //console.log(output3)
-    this.setState({billTotal: output3[groupIdx].groupKeyTot})
-    console.log(output3[groupIdx].groupKeyTot)
-    //this.setState({billItem: itemies})
-    //this.setState({ Group: [...this.state.Group, ...[{key: this.state.count-1, title: 'Group ' + this.state.count, billItem: [{id: 0, itemAmount: '£0.00', itemIcon: 'restaurant'}]}]] })
-
-
-    //console.log(JSON.stringify(this.state.Group[groupIdx].billItem[itemIdx].itemAmount))
-    //this.setState({billTotal: this.state.Group[0].billItem})
+  componentDidUpdate() {
   }
+
+  handleOnChangeText(value) {
+
+    this.setState(prevState => {
+      let groupies = [...prevState.Group]
+      let groupIdx = this.state.selectedGroupIndex
+      let itemIdx = this.state.selectedItemIndex
+      //console.log("Group index: " + groupIdx)
+      //console.log("Item index: " + itemIdx)
+      //this.setState({textHolder: value})
+
+      //console.log(value)
+      let itemies = [...groupies[groupIdx].billItem]
+      itemies[itemIdx] = {...itemies[itemIdx], itemAmount: value}
+
+      groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
+      //console.log(groupies)
+
+
+      //ISSUE: parseFloat causes rounding error
+      //ISSUE: returns NaN if textbox input is empty
+      let groupTotals = groupies.map(x => ({
+        key: x.key,
+        groupTitle: x.title,
+        groupTot: x.billItem.reduce(function (accumulator, currentValue) {
+          return parseFloat(accumulator) + parseFloat(currentValue.itemAmount)
+        }, 0)
+      }));
+      groupies[groupIdx] = {...groupies[groupIdx], billTotal: groupTotals[groupIdx].groupTot}
+
+
+      this.setState({Group: groupies })
+
+      //console.log(JSON.stringify(this.state.Group))
+      console.log(groupTotals)
+
+      let sum = groupTotals.reduce(function (accumulator, currentValue) {
+        return parseFloat(accumulator) + parseFloat(currentValue.groupTot)
+      }, 0)
+
+      this.setState({billTotal: sum})
+      //this.setState({GroupTot: output3})
+      //console.log("billtotal state: " + this.state.billTotal)
+      return {groupies}
+    });
+
+  }
+
+
+
   handleInputFocus = item => {
     console.log("onInputFocus: True")
     this.setState({selectedItemIndex: item.id})
@@ -128,6 +136,7 @@ export default class HomeScreen extends React.Component {
     //console.log(item.key)
     this.setState({selectedGroupIndex: item.key})
     //console.log(item.key)
+
   }
 
   GetItem(item) {
@@ -153,8 +162,8 @@ export default class HomeScreen extends React.Component {
                                               inputStyle={styles.itemAmountBox}
                                               keyboardType='numeric'
                                               onFocus={() => this.handleInputFocus(item)}
-                                              onChangeText={this.handleOnChangeText}
-                                              value={this.state.itemAmount}
+                                              onChangeText={item => this.handleOnChangeText(item)}
+                                              defaultValue={item.itemAmount}
                                             />
                                             <Icon
                                               name={item.itemIcon}
@@ -166,6 +175,8 @@ export default class HomeScreen extends React.Component {
             keyExtractor={item => item.key}
             listKey={(item, index) => 'A' + index.toString()}
         />
+
+        <Text>Total: {item.billTotal}</Text>
       </View>
     )
   }
@@ -205,13 +216,10 @@ export default class HomeScreen extends React.Component {
 }
 
 HomeScreen.navigationOptions = {
+  headerShown: false,
   header: null,
+  visible: false,
 };
-
-function handleExample() {
-  //do something
-};
-
 
 const styles = StyleSheet.create({
   container: {
