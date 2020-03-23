@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, TVEventHandler, FlatList, Alert, Platform, ListItem, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, SafeAreaView, FlatList, Alert, Platform, ListItem, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as WebBrowser from 'expo-web-browser';
 
@@ -12,13 +12,7 @@ import { MonoText } from '../components/StyledText';
 import GroupList from '../components/GroupList';
 
 export default class HomeScreen extends React.Component {
-  static navigationOptions = {
-    headerShown: false,
-    header: {
-      visible: false,
-    },
-    visible: false,
-  };
+
   constructor(props) {
     super(props);
 
@@ -147,7 +141,7 @@ export default class HomeScreen extends React.Component {
 
   renderGroupItem = ({item, index}) => {
     return (
-      <View>
+      <View style={styles.mainView} >
         <View style={styles.itemBox}>
           <Text style={styles.itemTitle} onPress={this.GetItem.bind(this, item.title)}> {item.title} </Text>
         </View>
@@ -163,7 +157,6 @@ export default class HomeScreen extends React.Component {
                                               keyboardType='numeric'
                                               onFocus={() => this.handleInputFocus(item)}
                                               onChangeText={item => this.handleOnChangeText(item)}
-                                              defaultValue={item.itemAmount}
                                             />
                                             <Icon
                                               name={item.itemIcon}
@@ -183,8 +176,7 @@ export default class HomeScreen extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
-
+      <SafeAreaView style={styles.container}>
           <FlatList keyboardDismissMode='on-drag'
             data={this.state.Group}
             width='100%'
@@ -209,7 +201,7 @@ export default class HomeScreen extends React.Component {
           <View style={styles.billTotalFooter}>
             <Text>Total: £{this.state.billTotal}</Text>
           </View>
-      </View>
+      </SafeAreaView>
 
     );
   }
@@ -224,7 +216,11 @@ HomeScreen.navigationOptions = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 20,
     backgroundColor: '#fff',
+  },
+  mainView: {
+    marginTop: 30,
   },
   billTotalFooter: {
     fontSize: 20,

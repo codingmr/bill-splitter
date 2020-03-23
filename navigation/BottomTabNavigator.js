@@ -14,7 +14,7 @@ export default function BottomTabNavigator({ navigation, route }) {
   // Set the header title on the parent stack navigator depending on the
   // currently active tab. Learn more in the documentation:
   // https://reactnavigation.org/docs/en/screen-options-resolution.html
-  navigation.setOptions({ headerMode: null });
+  navigation.setOptions({ headerTitle: getHeaderTitle(route), headerShown: false });
 
   return (
     <BottomTab.Navigator initialRouteName={INITIAL_ROUTE_NAME}>
@@ -32,7 +32,6 @@ export default function BottomTabNavigator({ navigation, route }) {
         options={{
           title: 'Bill Splitter',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-cash" />,
-          headerShown: false,
         }}
       />
       <BottomTab.Screen
