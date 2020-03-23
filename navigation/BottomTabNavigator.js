@@ -32,6 +32,7 @@ export default function BottomTabNavigator({ navigation, route }) {
         options={{
           title: 'Bill Splitter',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-cash" />,
+          headerShown: false,
         }}
       />
       <BottomTab.Screen
