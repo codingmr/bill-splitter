@@ -27,7 +27,7 @@ export default class HomeScreen extends React.Component {
         {
           key: 0,
           title: 'Group 1',
-          billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}, {id: 1, itemAmount: '0.00', itemIcon: 'restaurant'}],
+          billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}],
           groupTotal: 0,
         },
         {
@@ -41,12 +41,11 @@ export default class HomeScreen extends React.Component {
 
   }
 
-  joinData = () => {
-    // TODO: scroll screen to bottom
 
+  joinData = () => {
     this.setState({count: this.state.count + 1})
 
-    this.setState({ Group: [...this.state.Group, ...[{key: this.state.count-1, title: 'Group ' + this.state.count, billTotal: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] })
+    this.setState({ Group: [...this.state.Group, ...[{key: this.state.count-1, title: 'Group ' + this.state.count, groupTotal: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] })
     this.ListView_Ref.scrollToEnd({ animated: true });
   }
 
@@ -69,14 +68,84 @@ export default class HomeScreen extends React.Component {
     //ISSUE: parseFloat causes rounding error
     //ISSUE: returns NaN if textbox input is empty
 
+    let initialValue = value
 
+    // if selected index is -1 of list length
+    let groupIdx = this.state.selectedGroupIndex
+    let itemIdx = this.state.selectedItemIndex
+    let groupies = this.state.Group
+    let itemies = [...groupies[groupIdx].billItem]
+
+
+    /// ADD BOX
+    // To achieve adding only 1 new box when input is entered in to the previous one:
+    //  match the number of inputboxs with the selected inputbox index
+    console.log("itemies length: " + itemies.length)
+    console.log("itemIdx: " + itemIdx)
+    if (initialValue > 0 && (itemies.length-1 == itemIdx)) {
+      console.log("true")
+      this.setState(prevState => {
+        //TODO: hold group
+        //TODO: join a new entry of items to group
+        let groupies = [...prevState.Group]
+        let groupIdx = this.state.selectedGroupIndex
+        let itemIdx = this.state.selectedItemIndex
+
+        let itemies = [...groupies[groupIdx].billItem ]
+        //console.log("itemies length: " + itemies.length)
+        itemies = [...itemies, {id: itemies.length, itemAmount: '0.00', itemIcon: 'restaurant'}]
+        //console.log("itemies: " + JSON.stringify(itemies))
+
+        groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
+
+        //console.log(JSON.stringify(groupies[0]))
+        return {Group: groupies}
+      })
+    }
+    // DELETE BOX
+    else if (itemies.length-1 != itemIdx
+                && (initialValue==''
+                && (itemies[itemIdx+1].itemAmount=='' || itemies[itemIdx+1].itemAmount=='0.00')
+                && itemies.length-2 == itemIdx )) {
+      // if not last inputbox
+      // and current input is empty
+      // and next inputbox is empty
+      // and selected inputbox is one from the last inputbox
+      this.setState(prevState => {
+        //TODO: hold group
+        //TODO: join a new entry of items to group
+        let groupies = [...prevState.Group]
+        let groupIdx = this.state.selectedGroupIndex
+        let itemIdx = this.state.selectedItemIndex
+
+        let itemies = [...groupies[groupIdx].billItem ]
+        //console.log("itemies length: " + itemies.length)
+        itemies.pop()
+        //console.log("itemies: " + JSON.stringify(itemies))
+
+        groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
+
+        //console.log(JSON.stringify(groupies[0]))
+        return {Group: groupies}
+      })
+
+
+      console.log("trigger mammoth")
+    }
+
+    // UPDATE STATE WITH BOX INPUT
     this.setState(prevState => {
+      let initialValue = value
+
+      if (isNaN(initialValue) || initialValue=='') {initialValue = 0}
+      console.log("initialValue: " + initialValue)
+
       let groupies = [...prevState.Group]
       let groupIdx = this.state.selectedGroupIndex
       let itemIdx = this.state.selectedItemIndex
 
       let itemies = [...groupies[groupIdx].billItem]
-      itemies[itemIdx] = {...itemies[itemIdx], itemAmount: value}
+      itemies[itemIdx] = {...itemies[itemIdx], itemAmount: initialValue}
 
       groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
 
@@ -90,8 +159,8 @@ export default class HomeScreen extends React.Component {
       groupies[groupIdx] = {...groupies[groupIdx], groupTotal: groupTotals[groupIdx].groupTot}
 
 
-      console.log(JSON.stringify(this.state.Group))
-      console.log(groupTotals)
+      //console.log(JSON.stringify(this.state.Group))
+      //console.log(groupTotals)
 
       let sum = groupTotals.reduce(function (accumulator, currentValue) {
         return parseFloat(accumulator) + parseFloat(currentValue.groupTot)
@@ -100,6 +169,7 @@ export default class HomeScreen extends React.Component {
       return {Group: groupies}
     });
 
+    // UPDATE STATE AFTER SUM TOTALS
     this.setState(prevState => {
       let groupies = [...prevState.Group]
       let groupIdx = this.state.selectedGroupIndex
@@ -111,7 +181,7 @@ export default class HomeScreen extends React.Component {
         groupTot: x.groupTotal
       }))
 
-      console.log("groupTotals: " + JSON.stringify(groupTotals))
+      //console.log("groupTotals: " + JSON.stringify(groupTotals))
 
       let sum = groupTotals.reduce(function (accumulator, currentValue) {
         return parseFloat(accumulator) + parseFloat(currentValue.groupTot)
@@ -152,34 +222,37 @@ export default class HomeScreen extends React.Component {
   renderGroupItem = ({item, index}) => {
     return (
       <View style={styles.mainView} >
-        <View style={styles.itemBox}>
+        <View style={styles.titleBox}>
           <Text style={styles.itemTitle} onPress={this.GetItem.bind(this, item.title)}> {item.title} </Text>
         </View>
 
-        <FlatList
-            onFocus={() => this.handleGroupFocus(item)}
-            data={item.billItem}
-            renderItem = {({ item, index }) => <View style={styles.groupBox}>
-                                          <View style={styles.inlineContainer}>
-                                            <Input
-                                              placeholder={'0.00'}
-                                              inputStyle={styles.itemAmountBox}
-                                              keyboardType='numeric'
-                                              onFocus={() => this.handleInputFocus(item)}
-                                              onChangeText={item => this.handleOnChangeText(item)}
-                                            />
-                                            <Icon
-                                              name={item.itemIcon}
-                                              type='Ionicon'
-                                              iconStyle={styles.itemIconBox}
-                                            />
-                                          </View>
-                                        </View>}
-            keyExtractor={item => item.key}
-            listKey={(item, index) => 'A' + index.toString()}
-        />
-
-        <Text>Total: {item.groupTotal}</Text>
+        <View style={styles.groupBox}>
+          <FlatList
+              onFocus={() => this.handleGroupFocus(item)}
+              data={item.billItem}
+              renderItem = {({ item, index }) => <View style={styles.itemBox}>
+                                            <View style={styles.inlineContainer}>
+                                              <Input
+                                                placeholder={'£0.00'}
+                                                inputStyle={styles.itemAmountBox}
+                                                placeholderTextColor="#000"
+                                                keyboardType='numeric'
+                                                onFocus={() => this.handleInputFocus(item)}
+                                                onChangeText={item => this.handleOnChangeText(item)}
+                                              />
+                                              <Icon
+                                                name={item.itemIcon}
+                                                type='Ionicon'
+                                                iconStyle={styles.itemIconBox}
+                                              />
+                                            </View>
+                                          </View>}
+              keyExtractor={(item, index) => 'item.id'+index}
+          />
+          <View style={styles.groupTotalBox}>
+            <Text style={{fontSize: 18}}>Group total: £{item.groupTotal}</Text>
+          </View>
+        </View>
       </View>
     )
   }
@@ -191,8 +264,12 @@ export default class HomeScreen extends React.Component {
             data={this.state.Group}
             width='100%'
 
+            ref={(ref) => {
+              this.ListView_Ref = ref;
+            }}
+
             ItemSeparatorComponent={this.FlatListItemSeparator}
-            keyExtractor={item => item.id}
+            keyExtractor={(item, index) => 'item.key'+index}
             renderItem = {this.renderGroupItem}
             extraData={this.state}
             ListFooterComponent={<View style={styles.addGroupContainer}><Icon
@@ -205,7 +282,7 @@ export default class HomeScreen extends React.Component {
                                 }
           />
           <View style={styles.billTotalFooter}>
-            <Text>Total: £{this.state.billTotal}</Text>
+            <Text style={{fontSize: 27, padding: 5}}>Bill total: £{this.state.billTotal}</Text>
           </View>
       </SafeAreaView>
 
@@ -230,10 +307,20 @@ const styles = StyleSheet.create({
   },
   billTotalFooter: {
     fontSize: 20,
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    backgroundColor: '#fff',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.00,
+
+    elevation: 3,
   },
   addGroupContainer:{
-    paddingTop: 5,
+    paddingTop: 15,
     alignItems: 'center',
     marginBottom: 300,
   },
@@ -244,33 +331,62 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     textAlign: 'center',
   },
+  groupTotalBox: {
+    backgroundColor: '#bfc1c2',
+    paddingVertical: 10,
+    alignItems: 'flex-end',
+    paddingHorizontal: 20,
+  },
   groupBox: {
-    backgroundColor: 'blue',
     width: '80%',
     alignSelf: 'center',
-    marginBottom: 10,
+    backgroundColor: '#ededed',
+    borderRadius: 1.8,
+    shadowColor: "#000",
+    shadowOffset: {
+    	width: 0,
+    	height: 1,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 1.00,
+
+    elevation: 3,
   },
   inlineContainer: {
-    backgroundColor: 'red',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 50,
-    paddingTop: 5,
-    marginBottom: 5,
+    justifyContent: 'center',
+    paddingHorizontal: '20%',
   },
   itemBox: {
-    width: '80%',
+    backgroundColor: '#ededed',
+    marginBottom: 10,
+  },
+  titleBox: {
+    width: '90%',
     alignSelf: 'center',
-    backgroundColor: 'green',
+    backgroundColor: '#3A4A4D',
     alignItems: 'center',
+    borderRadius: 3.6,
+    shadowColor: "#000",
+    shadowOffset: {
+    	width: 0,
+    	height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
   },
   itemTitle: {
-    fontSize: 24,
+    fontSize: 20,
+    padding: 4,
+    color: '#bfc1c2',
   },
   itemIconBox: {
     marginTop: 12,
   },
   itemAmountBox: {
+    color: '#424142',
   },
   contentContainer: {
     paddingTop: 30,
