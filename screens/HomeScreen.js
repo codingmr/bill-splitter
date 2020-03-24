@@ -223,7 +223,21 @@ export default class HomeScreen extends React.Component {
     return (
       <View style={styles.mainView} >
         <View style={styles.titleBox}>
+        <Icon
+            size={26}
+            name='trash'
+            type='font-awesome'
+            color='#cc6666'
+            iconStyle={{padding: 5, paddingHorizontal: 10}}
+        />
           <Text style={styles.itemTitle} onPress={this.GetItem.bind(this, item.title)}> {item.title} </Text>
+          <Icon
+              size={26}
+              name='edit'
+              type='font-awesome'
+              color='#bab6b3'
+              iconStyle={{padding: 5, paddingHorizontal: 10}}
+          />
         </View>
 
         <View style={styles.groupBox}>
@@ -365,7 +379,8 @@ const styles = StyleSheet.create({
     width: '90%',
     alignSelf: 'center',
     backgroundColor: '#3A4A4D',
-    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     borderRadius: 3.6,
     shadowColor: "#000",
     shadowOffset: {
