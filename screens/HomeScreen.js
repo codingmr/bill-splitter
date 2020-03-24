@@ -66,25 +66,20 @@ export default class HomeScreen extends React.Component {
   }
 
   handleOnChangeText(value) {
+    //ISSUE: parseFloat causes rounding error
+    //ISSUE: returns NaN if textbox input is empty
+
 
     this.setState(prevState => {
       let groupies = [...prevState.Group]
       let groupIdx = this.state.selectedGroupIndex
       let itemIdx = this.state.selectedItemIndex
-      //console.log("Group index: " + groupIdx)
-      //console.log("Item index: " + itemIdx)
-      //this.setState({textHolder: value})
 
-      //console.log(value)
       let itemies = [...groupies[groupIdx].billItem]
       itemies[itemIdx] = {...itemies[itemIdx], itemAmount: value}
 
       groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
-      //console.log(groupies)
 
-
-      //ISSUE: parseFloat causes rounding error
-      //ISSUE: returns NaN if textbox input is empty
       let groupTotals = groupies.map(x => ({
         key: x.key,
         groupTitle: x.title,
@@ -102,13 +97,29 @@ export default class HomeScreen extends React.Component {
         return parseFloat(accumulator) + parseFloat(currentValue.groupTot)
       }, 0)
 
-      //this.setState({billTotal: sum})
-      //this.setState({GroupTot: output3})
-      //console.log("billtotal state: " + this.state.billTotal)
       return {Group: groupies}
     });
 
-    this.setState({billTotal: 123})
+    this.setState(prevState => {
+      let groupies = [...prevState.Group]
+      let groupIdx = this.state.selectedGroupIndex
+      let itemIdx = this.state.selectedItemIndex
+
+      let groupTotals = groupies.map(x => ({
+        key: x.key,
+        groupTitle: x.title,
+        groupTot: x.groupTotal
+      }))
+
+      console.log("groupTotals: " + JSON.stringify(groupTotals))
+
+      let sum = groupTotals.reduce(function (accumulator, currentValue) {
+        return parseFloat(accumulator) + parseFloat(currentValue.groupTot)
+      }, 0)
+
+      return {billTotal: sum}
+    });
+
   }
 
 
@@ -179,10 +190,6 @@ export default class HomeScreen extends React.Component {
           <FlatList keyboardDismissMode='on-drag'
             data={this.state.Group}
             width='100%'
-
-            ref={(ref) => {
-              this.ListView_Ref = ref;
-            }}
 
             ItemSeparatorComponent={this.FlatListItemSeparator}
             keyExtractor={item => item.id}
