@@ -28,13 +28,13 @@ export default class HomeScreen extends React.Component {
           key: 0,
           title: 'Group 1',
           billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}, {id: 1, itemAmount: '0.00', itemIcon: 'restaurant'}],
-          billTotal: 0,
+          groupTotal: 0,
         },
         {
           key: 1,
           title: 'Group 2',
           billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}, {id: 1, itemAmount: '0.00', itemIcon: 'restaurant'}, {id: 2, itemAmount: '0.00', itemIcon: 'restaurant'}],
-          billTotal: 0,
+          groupTotal: 0,
         }
       ],
     }
@@ -92,24 +92,23 @@ export default class HomeScreen extends React.Component {
           return parseFloat(accumulator) + parseFloat(currentValue.itemAmount)
         }, 0)
       }));
-      groupies[groupIdx] = {...groupies[groupIdx], billTotal: groupTotals[groupIdx].groupTot}
+      groupies[groupIdx] = {...groupies[groupIdx], groupTotal: groupTotals[groupIdx].groupTot}
 
 
-      this.setState({Group: groupies })
-
-      //console.log(JSON.stringify(this.state.Group))
+      console.log(JSON.stringify(this.state.Group))
       console.log(groupTotals)
 
       let sum = groupTotals.reduce(function (accumulator, currentValue) {
         return parseFloat(accumulator) + parseFloat(currentValue.groupTot)
       }, 0)
 
-      this.setState({billTotal: sum})
+      //this.setState({billTotal: sum})
       //this.setState({GroupTot: output3})
       //console.log("billtotal state: " + this.state.billTotal)
-      return {groupies}
+      return {Group: groupies}
     });
 
+    this.setState({billTotal: 123})
   }
 
 
@@ -169,7 +168,7 @@ export default class HomeScreen extends React.Component {
             listKey={(item, index) => 'A' + index.toString()}
         />
 
-        <Text>Total: {item.billTotal}</Text>
+        <Text>Total: {item.groupTotal}</Text>
       </View>
     )
   }
