@@ -15,289 +15,29 @@ export default class HomeScreen extends React.Component {
 
   constructor(props) {
     super(props);
+    console.log(props)
 
     this.state = {
-      textInput_Holder: '',
-      count: 3,
-      billTotal: 0.00,
-      selectedGroupIndex: 0,
-      selectedItemIndex: 0,
-      textHolder: '',
-      Group: [
-        {
-          key: 0,
-          title: 'Group 1',
-          billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}],
-          groupTotal: 0,
-        },
-        {
-          key: 1,
-          title: 'Group 2',
-          billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}, {id: 1, itemAmount: '0.00', itemIcon: 'restaurant'}, {id: 2, itemAmount: '0.00', itemIcon: 'restaurant'}],
-          groupTotal: 0,
-        }
-      ],
+      billTotal: 0,
     }
 
   }
 
-
-  joinData = () => {
-    this.setState({count: this.state.count + 1})
-
-    this.setState({ Group: [...this.state.Group, ...[{key: this.state.count-1, title: 'Group ' + this.state.count, groupTotal: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] })
-    this.ListView_Ref.scrollToEnd({ animated: true });
-  }
-
-
-  FlatListItemSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 0,
-          width: "100%",
-        }}
-      />
-    );
-  }
-
-  componentDidUpdate() {
-  }
-
-  handleOnChangeText(value) {
-    //ISSUE: parseFloat causes rounding error
-    //ISSUE: returns NaN if textbox input is empty
-
-    let initialValue = value
-
-    // if selected index is -1 of list length
-    let groupIdx = this.state.selectedGroupIndex
-    let itemIdx = this.state.selectedItemIndex
-    let groupies = this.state.Group
-    let itemies = [...groupies[groupIdx].billItem]
-
-
-    /// ADD BOX
-    // To achieve adding only 1 new box when input is entered in to the previous one:
-    //  match the number of inputboxs with the selected inputbox index
-    console.log("itemies length: " + itemies.length)
-    console.log("itemIdx: " + itemIdx)
-    if (initialValue > 0 && (itemies.length-1 == itemIdx)) {
-      console.log("true")
-      this.setState(prevState => {
-        //TODO: hold group
-        //TODO: join a new entry of items to group
-        let groupies = [...prevState.Group]
-        let groupIdx = this.state.selectedGroupIndex
-        let itemIdx = this.state.selectedItemIndex
-
-        let itemies = [...groupies[groupIdx].billItem ]
-        //console.log("itemies length: " + itemies.length)
-        itemies = [...itemies, {id: itemies.length, itemAmount: '0.00', itemIcon: 'restaurant'}]
-        //console.log("itemies: " + JSON.stringify(itemies))
-
-        groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
-
-        //console.log(JSON.stringify(groupies[0]))
-        return {Group: groupies}
-      })
-    }
-    // DELETE BOX
-    else if (itemies.length-1 != itemIdx
-                && (initialValue==''
-                && (itemies[itemIdx+1].itemAmount=='' || itemies[itemIdx+1].itemAmount=='0.00')
-                && itemies.length-2 == itemIdx )) {
-      // if not last inputbox
-      // and current input is empty
-      // and next inputbox is empty
-      // and selected inputbox is one from the last inputbox
-      this.setState(prevState => {
-        //TODO: hold group
-        //TODO: join a new entry of items to group
-        let groupies = [...prevState.Group]
-        let groupIdx = this.state.selectedGroupIndex
-        let itemIdx = this.state.selectedItemIndex
-
-        let itemies = [...groupies[groupIdx].billItem ]
-        //console.log("itemies length: " + itemies.length)
-        itemies.pop()
-        //console.log("itemies: " + JSON.stringify(itemies))
-
-        groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
-
-        //console.log(JSON.stringify(groupies[0]))
-        return {Group: groupies}
-      })
-
-
-      console.log("trigger mammoth")
-    }
-
-    // UPDATE STATE WITH BOX INPUT
-    this.setState(prevState => {
-      let initialValue = value
-
-      if (isNaN(initialValue) || initialValue=='') {initialValue = 0}
-      console.log("initialValue: " + initialValue)
-
-      let groupies = [...prevState.Group]
-      let groupIdx = this.state.selectedGroupIndex
-      let itemIdx = this.state.selectedItemIndex
-
-      let itemies = [...groupies[groupIdx].billItem]
-      itemies[itemIdx] = {...itemies[itemIdx], itemAmount: initialValue}
-
-      groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
-
-      let groupTotals = groupies.map(x => ({
-        key: x.key,
-        groupTitle: x.title,
-        groupTot: x.billItem.reduce(function (accumulator, currentValue) {
-          return parseFloat(accumulator) + parseFloat(currentValue.itemAmount)
-        }, 0)
-      }));
-      groupies[groupIdx] = {...groupies[groupIdx], groupTotal: groupTotals[groupIdx].groupTot}
-
-
-      //console.log(JSON.stringify(this.state.Group))
-      //console.log(groupTotals)
-
-      let sum = groupTotals.reduce(function (accumulator, currentValue) {
-        return parseFloat(accumulator) + parseFloat(currentValue.groupTot)
-      }, 0)
-
-      return {Group: groupies}
-    });
-
-    // UPDATE STATE AFTER SUM TOTALS
-    this.setState(prevState => {
-      let groupies = [...prevState.Group]
-      let groupIdx = this.state.selectedGroupIndex
-      let itemIdx = this.state.selectedItemIndex
-
-      let groupTotals = groupies.map(x => ({
-        key: x.key,
-        groupTitle: x.title,
-        groupTot: x.groupTotal
-      }))
-
-      //console.log("groupTotals: " + JSON.stringify(groupTotals))
-
-      let sum = groupTotals.reduce(function (accumulator, currentValue) {
-        return parseFloat(accumulator) + parseFloat(currentValue.groupTot)
-      }, 0)
-
-      return {billTotal: sum}
-    });
-
-  }
-
-
-
-  handleInputFocus = item => {
-    console.log("onInputFocus: True")
-    this.setState({selectedItemIndex: item.id})
-    //console.log(item.id)
-    //console.log(JSON.stringify(this.state.Group))
-  }
-
-  handleGroupFocus = item => {
-    console.log("onGroupFocus: True")
-    // TODO: get selected index
-    // TODO: update state of selected index
-    //console.log(!item.isSelect)
-    //console.log(item.title)
-    //console.log(item.key)
-    this.setState({selectedGroupIndex: item.key})
-    //console.log(item.key)
-
-  }
-
-  GetItem(item) {
-
-    Alert.alert(item);
-
-  }
-
-  renderGroupItem = ({item, index}) => {
-    return (
-      <View style={styles.mainView} >
-        <View style={styles.titleBox}>
-        <Icon
-            size={26}
-            name='trash'
-            type='font-awesome'
-            color='#cc6666'
-            iconStyle={{padding: 5, paddingHorizontal: 10}}
-        />
-          <Text style={styles.itemTitle} onPress={this.GetItem.bind(this, item.title)}> {item.title} </Text>
-          <Icon
-              size={26}
-              name='edit'
-              type='font-awesome'
-              color='#bab6b3'
-              iconStyle={{padding: 5, paddingHorizontal: 10}}
-          />
-        </View>
-
-        <View style={styles.groupBox}>
-          <FlatList
-              onFocus={() => this.handleGroupFocus(item)}
-              data={item.billItem}
-              renderItem = {({ item, index }) => <View style={styles.itemBox}>
-                                            <View style={styles.inlineContainer}>
-                                              <Input
-                                                placeholder={'£0.00'}
-                                                inputStyle={styles.itemAmountBox}
-                                                placeholderTextColor="#000"
-                                                keyboardType='numeric'
-                                                onFocus={() => this.handleInputFocus(item)}
-                                                onChangeText={item => this.handleOnChangeText(item)}
-                                              />
-                                              <Icon
-                                                name={item.itemIcon}
-                                                type='Ionicon'
-                                                iconStyle={styles.itemIconBox}
-                                              />
-                                            </View>
-                                          </View>}
-              keyExtractor={(item, index) => 'item.id'+index}
-          />
-          <View style={styles.groupTotalBox}>
-            <Text style={{fontSize: 18}}>Group total: £{item.groupTotal}</Text>
-          </View>
-        </View>
-      </View>
-    )
+  parentMethod(childData) {
+    console.log(childData)
+    this.setState({billTotal: childData})
   }
 
   render() {
     return (
       <SafeAreaView style={styles.container}>
-          <FlatList keyboardDismissMode='on-drag'
-            data={this.state.Group}
-            width='100%'
+          <GroupList onRef={ref => (this.parentReference = ref)}
+                     parentReference={this.parentMethod.bind(this)}/>
 
-            ref={(ref) => {
-              this.ListView_Ref = ref;
-            }}
-
-            ItemSeparatorComponent={this.FlatListItemSeparator}
-            keyExtractor={(item, index) => 'item.key'+index}
-            renderItem = {this.renderGroupItem}
-            extraData={this.state}
-            ListFooterComponent={<View style={styles.addGroupContainer}><Icon
-                                    raised
-                                    name='plus'
-                                    type='font-awesome'
-                                    color='#a3c1ad'
-                                    onPress={this.joinData}
-                                  /></View>
-                                }
-          />
           <View style={styles.billTotalFooter}>
             <Text style={{fontSize: 27, padding: 5}}>Bill total: £{this.state.billTotal}</Text>
           </View>
+
       </SafeAreaView>
 
     );
