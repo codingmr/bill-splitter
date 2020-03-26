@@ -3,6 +3,7 @@ import { Image, SafeAreaView, FlatList, Alert, Platform, ListItem, StyleSheet, T
 import { ScrollView } from 'react-native-gesture-handler';
 import * as WebBrowser from 'expo-web-browser';
 
+import { TextInputMask } from 'react-native-masked-text';
 
 import { Icon, Input } from 'react-native-elements'
 
@@ -19,6 +20,7 @@ export default class HomeScreen extends React.Component {
 
     this.state = {
       billTotal: 0,
+      advanced: 0,
     }
 
   }
@@ -33,6 +35,24 @@ export default class HomeScreen extends React.Component {
       <SafeAreaView style={styles.container}>
           <GroupList onRef={ref => (this.parentReference = ref)}
                      parentReference={this.parentMethod.bind(this)}/>
+
+          <TextInputMask
+             type={'money'}
+             value={this.state.advanced}
+             options={{
+               precision: 2,
+               separator: '.',
+               delimiter: ',',
+               unit: '£',
+               suffixUnit: '',
+             }}
+             includeRawValueInChangeText={true}
+             onChangeText={(maskedText, rawText) =>{
+               console.log("Mask: " + maskedText)
+               console.log("rawText: " + rawText)
+               this.setState({advanced: maskedText})
+             }}
+           />
 
           <View style={styles.billTotalFooter}>
             <Text style={{fontSize: 27, padding: 5}}>Bill total: £{this.state.billTotal}</Text>
