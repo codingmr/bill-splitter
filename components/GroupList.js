@@ -45,7 +45,7 @@ export default class GroupList extends React.Component {
       return { Group: [...prevState.Group, ...[{key: this.state.count, title: 'Group ' + this.state.count, groupTotal: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] }
     })
 
-    this.setState({selectedGroupIndex: this.state.selectedGroupIndex+1})
+    //this.setState({selectedGroupIndex: this.state.selectedGroupIndex+1})
 
     //console.log(JSON.stringify(this.state.Group, null, 1))
     //console.log("selected index: " +this.state.selectedItemIndex)

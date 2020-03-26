@@ -35,7 +35,8 @@ export default class HomeScreen extends React.Component {
                      parentReference={this.parentMethod.bind(this)}/>
 
           <View style={styles.billTotalFooter}>
-            <Text style={{fontSize: 27, padding: 5}}>Bill total: £{this.state.billTotal}</Text>
+            <Text style={{fontSize: 27, padding: 5}}>Total:</Text>
+            <Text style={{fontSize: 27, padding: 5, marginRight: 30}}>£{this.state.billTotal}</Text>
           </View>
 
       </SafeAreaView>
@@ -52,8 +53,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   billTotalFooter: {
+    flexDirection: 'row',
     fontSize: 20,
     alignItems: 'flex-start',
+    justifyContent: 'space-between',
     backgroundColor: '#fff',
     shadowColor: "#000",
     shadowOffset: {
