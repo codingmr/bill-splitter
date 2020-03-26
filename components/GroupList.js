@@ -3,7 +3,7 @@ import { Text, View, FlatList, StyleSheet } from 'react-native';
 
 import { ListItem, Icon, Input } from 'react-native-elements';
 
-import { TextInputMask } from 'react-native-masked-text';
+import { TextInputMask } from 'react-native-text-input-mask';
 
 export default class GroupList extends React.Component {
   constructor(props) {
@@ -41,7 +41,7 @@ export default class GroupList extends React.Component {
 
     this.setState(prevState => {
       // set focus to first textbox in the correct group
-      return { Group: [...prevState.Group, ...[{key: this.state.count, title: 'Group ' + this.state.count, groupTotal: 0, billItem: [{id: 0, itemAmount: 660, itemIcon: 'restaurant'}]}]] }
+      return { Group: [...prevState.Group, ...[{key: this.state.count, title: 'Group ' + this.state.count, groupTotal: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] }
     })
 
     this.setState({selectedGroupIndex: this.state.selectedGroupIndex+1})
@@ -49,31 +49,6 @@ export default class GroupList extends React.Component {
     //console.log(JSON.stringify(this.state.Group, null, 1))
     //console.log("selected index: " +this.state.selectedItemIndex)
     //console.log("selected group: " + this.state.selectedGroupIndex)
-  }
-
-  NEWhandleOnChangeText(value){
-    let groupies = [this.state.Group]
-    let groupIdx = this.state.selectedGroupIndex
-    let itemIdx = this.state.selectedItemIndex
-
-
-    console.log("selected group index: " + this.state.selectedGroupIndex)
-    console.log("selected group length: " + this.state.Group.length)
-    console.log("groupIDX: " + groupIdx)
-    console.log("count: " + this.state.count)
-
-    //let itemies = groupies[0].billItem[0].
-
-    //console.log("pre-items: " + JSON.stringify(groupies, null, 1))
-
-    //itemies[itemIdx] = {...itemies, key: 99, itemAmount: value, itemIcon: 'restaurant'}
-
-    //console.log("items: " + JSON.stringify(itemies, null, 1))
-
-    //groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
-
-    this.setState({Group: [...this.state.Group, ...[{key: this.state.count, title: 'Group ' + this.state.count, groupTotal: 0, billItem: [{id: 0, itemAmount: 50, itemIcon: 'restaurant'}]}]]})
-
   }
 
   handleOnChangeText(value) {
@@ -92,37 +67,34 @@ export default class GroupList extends React.Component {
       console.log("groupIDX: " + groupIdx)
       console.log("count: " + this.state.count)
       let itemies = [...groupies[groupIdx].billItem ]
-      console.log("pre-items: " + JSON.stringify(itemies, null, 1))
       // only numbers and letters are let into initialValue
       // however they magically show up when put into total????
       let initialValue = value
+      if (initialValue != '') {
+        let smallerInitialValue = initialValue.substr(1);
+      }
 
       if (isNaN(initialValue) || initialValue=='') {initialValue = 0}
 
-      itemies[itemIdx] = {...itemies[itemIdx], key: 99, itemAmount: value, itemIcon: 'restaurant'}
-
-      console.log("items: " + JSON.stringify(itemies, null, 1))
-
+      itemies[itemIdx] = {...itemies[itemIdx], itemAmount: ("£" + initialValue)}
       groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
-      console.log("groups: " + JSON.stringify(groupies[groupIdx], null, 1))
+
       //console.log(JSON.stringify(groupies[groupIdx], null, 1))
       // sum group totals into object array
       let groupTotals = groupies.map(x => ({
         key: x.key,
         groupTitle: x.title,
         groupTot: x.billItem.reduce(function (accumulator, currentValue) {
-          return accumulator + currentValue.itemAmount
+          return parseFloat(accumulator) + parseFloat(currentValue.itemAmount.substr(1))
         }, 0)
       }));
       groupies[groupIdx] = {...groupies[groupIdx], groupTotal: groupTotals[groupIdx].groupTot}
 
       // ADD BOX
       console.log("value: " +value)
-      console.log("invalue: " +initialValue)
-
       if (value != '' && (itemies.length-1 == itemIdx)) {
 
-          itemies = [...itemies, {id: itemies.length, itemAmount: 0, itemIcon: 'restaurant'}]
+          itemies = [...itemies, {id: itemies.length, itemAmount: '0.00', itemIcon: 'restaurant'}]
           groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
 
           //this.itemList_Ref.scrollToEnd({ animated: true });
@@ -130,7 +102,7 @@ export default class GroupList extends React.Component {
       // DELETE BOX
       else if (itemies.length-1 != itemIdx
                   && (initialValue==''
-                  && (itemies[itemIdx+1].itemAmount=='' || itemies[itemIdx+1].itemAmount==0)
+                  && (itemies[itemIdx+1].itemAmount=='' || itemies[itemIdx+1].itemAmount=='0.00')
                   && itemies.length-2 == itemIdx )) {
           // if not last inputbox
           // and current input is empty
@@ -188,7 +160,7 @@ export default class GroupList extends React.Component {
         }))
 
         let sum = groupTotals.reduce(function (accumulator, currentValue) {
-          return accumulator + currentValue.groupTot
+          return parseFloat(accumulator) + parseFloat(currentValue.groupTot)
         }, 0)
 
         // ISSUE: the bill total updates but there is a minor delay
@@ -241,33 +213,14 @@ export default class GroupList extends React.Component {
               data={item.billItem}
               renderItem = {({ item, index }) => <View style={styles.itemBox}>
                                             <View style={styles.inlineContainer}>
-                                              <TextInputMask
-                                                type={'money'}
-                                                value={item.itemAmount}
-                                                options={{
-                                                  precision: 2,
-                                                  separator: '.',
-                                                  delimiter: ',',
-                                                  unit: '£',
-                                                  suffixUnit: '',
-                                                }}
-                                                includeRawValueInChangeText={true}
-                                                onChangeText={(maskedText, rawText) =>{
-                                                  this.setState(prevState => {
-                                                    let groupies = [prevState.Group, ...[{key: 0, title: 'Group ' + 0, groupTotal: 0, billItem: [{id: 0, itemAmount: rawText, itemIcon: 'restaurant'}]}]]
-                                                    console.log("groupies: " + JSON.stringify(groupies, null, 1))
-                                                    return {Group: groupies}
-                                                  })
-                                                  console.log("yolo: " + item.itemAmount)
-                                                  console.log("Mask: " + maskedText)
-                                                  console.log("rawText: " + rawText)
-                                                  console.log("Group:" + JSON.stringify(item, null, 1))
-                                                }}
-                                                style={styles.itemAmountBox}
-                                                //placeholderTextColor="#000"
-                                                //keyboardType='numeric'
-                                                //onFocus={() => this.handleInputFocus(item, index)}
-                                                //onChangeText={item => this.handleOnChangeText(item)}
+                                              <Input
+                                                ref={ref => { this.input = ref }}
+                                                placeholder={'£0.00'}
+                                                inputStyle={styles.itemAmountBox}
+                                                placeholderTextColor="#000"
+                                                keyboardType='numeric'
+                                                onFocus={() => this.handleInputFocus(item, index)}
+                                                onChangeText={item => this.handleOnChangeText(item)}
                                               />
                                               <Icon
                                                 name={item.itemIcon}
