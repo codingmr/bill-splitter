@@ -3,6 +3,7 @@ import { Text, View, FlatList, StyleSheet } from 'react-native';
 
 import { ListItem, Icon, Input } from 'react-native-elements';
 
+import DialogInput from 'react-native-dialog-input';
 
 export default class GroupList extends React.Component {
   constructor(props) {
@@ -15,6 +16,7 @@ export default class GroupList extends React.Component {
       selectedItemIndex: -1,
       textHolder: '',
       Group: [],
+      isDialogVisible: false,
     }
 
   }
@@ -180,18 +182,37 @@ export default class GroupList extends React.Component {
     //console.log("group: " + JSON.stringify(item, null, 1))
   }
 
+  sendInput(inputText) {
+    let groupIdx = this.state.selectedGroupIndex
+
+    console.log("Inputtest: " + inputText)
+    this.setState({isDialogVisible: false})
+    this.setState(prevState => {
+      let groupies = [...prevState.Group]
+      groupies[groupIdx] = {...groupies[groupIdx], title: inputText}
+
+      return {Group: groupies}
+    })
+
+  }
+
+  handleEditGroupName(item, index) {
+    this.setState({selectedGroupIndex: index})
+    this.setState({isDialogVisible: true})
+  }
+
   renderGroupItem = ({item, index}) => {
     return (
       <View style={styles.mainView} >
         <View style={styles.titleBox}>
-        <Icon
-            size={26}
-            name='trash'
-            type='font-awesome'
-            color='#cc6666'
-            onPress={() => this.handleDeleteGroup(item, index)}
-            iconStyle={{padding: 5, paddingHorizontal: 10}}
-        />
+          <Icon
+              size={26}
+              name='trash'
+              type='font-awesome'
+              color='#cc6666'
+              onPress={() => this.handleDeleteGroup(item, index)}
+              iconStyle={{padding: 5, paddingHorizontal: 10}}
+          />
           <Text style={styles.itemTitle}> {item.title} </Text>
           <Icon
               size={26}
@@ -199,6 +220,7 @@ export default class GroupList extends React.Component {
               type='font-awesome'
               color='#bab6b3'
               iconStyle={{padding: 5, paddingHorizontal: 10}}
+              onPress={() => this.handleEditGroupName(item, index)}
           />
         </View>
 
@@ -238,29 +260,37 @@ export default class GroupList extends React.Component {
 
   render() {
     return (
+        <FlatList
+          keyboardDismissMode='on-drag'
+          keyboardShouldPersistTaps='always'
+          data={this.state.Group}
+          width='100%'
 
-      <FlatList
-        keyboardDismissMode='on-drag'
-        keyboardShouldPersistTaps='always'
-        data={this.state.Group}
-        width='100%'
+          ref={(ref) => {
+            this.groupList_Ref = ref;
+          }}
 
-        ref={(ref) => {
-          this.groupList_Ref = ref;
-        }}
-
-        keyExtractor={(item, index) => 'item.key'+index}
-        renderItem = {this.renderGroupItem}
-        extraData={this.state}
-        ListFooterComponent={<View style={styles.addGroupContainer}><Icon
-                                raised
-                                name='plus'
-                                type='font-awesome'
-                                color='#a3c1ad'
-                                onPress={this.newGroup}
-                              /></View>
-                            }
-      />
+          keyExtractor={(item, index) => 'item.key'+index}
+          renderItem = {this.renderGroupItem}
+          extraData={this.state}
+          ListHeaderComponent={
+            <DialogInput isDialogVisible={this.state.isDialogVisible}
+              title={"Edit group name"}
+              message={"Enter a new name for the group"}
+              hintInput ={"Group " + this.state.selectedGroupIndex}
+              submitInput={ (inputText) => {this.sendInput(inputText)} }
+              closeDialog={ () => {this.setState({isDialogVisible: false})}}>
+            </DialogInput>
+          }
+          ListFooterComponent={<View style={styles.addGroupContainer}><Icon
+                                  raised
+                                  name='plus'
+                                  type='font-awesome'
+                                  color='#a3c1ad'
+                                  onPress={this.newGroup}
+                                /></View>
+          }
+        />
 
     );
   }
