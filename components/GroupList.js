@@ -3,6 +3,8 @@ import { Text, View, FlatList, StyleSheet } from 'react-native';
 
 import { ListItem, Icon, Input } from 'react-native-elements';
 
+import { TextInputMask } from 'react-native-text-input-mask';
+
 export default class GroupList extends React.Component {
   constructor(props) {
     super(props);
@@ -68,19 +70,22 @@ export default class GroupList extends React.Component {
       // only numbers and letters are let into initialValue
       // however they magically show up when put into total????
       let initialValue = value
-
+      if (initialValue != '') {
+        let smallerInitialValue = initialValue.substr(1);
+      }
 
       if (isNaN(initialValue) || initialValue=='') {initialValue = 0}
 
-      itemies[itemIdx] = {...itemies[itemIdx], itemAmount: initialValue}
+      itemies[itemIdx] = {...itemies[itemIdx], itemAmount: ("£" + initialValue)}
       groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
 
+      //console.log(JSON.stringify(groupies[groupIdx], null, 1))
       // sum group totals into object array
       let groupTotals = groupies.map(x => ({
         key: x.key,
         groupTitle: x.title,
         groupTot: x.billItem.reduce(function (accumulator, currentValue) {
-          return parseFloat(accumulator) + parseFloat(currentValue.itemAmount)
+          return parseFloat(accumulator) + parseFloat(currentValue.itemAmount.substr(1))
         }, 0)
       }));
       groupies[groupIdx] = {...groupies[groupIdx], groupTotal: groupTotals[groupIdx].groupTot}
@@ -107,6 +112,7 @@ export default class GroupList extends React.Component {
           groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
 
       }
+      console.log(JSON.stringify(groupies[groupIdx], null, 1))
       return {Group: groupies}
     })
 
@@ -164,15 +170,18 @@ export default class GroupList extends React.Component {
       });
     }
 
-  handleInputFocus = item => {
+  handleInputFocus = (item, index) => {
     console.log("onInputFocus: True")
-    this.setState({selectedItemIndex: item.id})
+
+    this.setState({selectedItemIndex: index})
     //this.itemList_Ref.scrollToIndex({ index: item.id, animated: true });
   }
 
-  handleGroupFocus = item => {
+  handleGroupFocus = (item, index) => {
     console.log("onGroupFocus: True")
-    this.setState({selectedGroupIndex: item.key})
+    this.setState({selectedGroupIndex: index})
+    //console.log("groupIndex: " + index)
+    //console.log("group: " + JSON.stringify(item, null, 1))
   }
 
   renderGroupItem = ({item, index}) => {
@@ -200,17 +209,17 @@ export default class GroupList extends React.Component {
         <View style={styles.groupBox}>
           <FlatList
               keyboardDismissMode='on-drag'
-              onFocus={() => this.handleGroupFocus(item)}
+              onFocus={() => this.handleGroupFocus(item, index)}
               data={item.billItem}
               renderItem = {({ item, index }) => <View style={styles.itemBox}>
                                             <View style={styles.inlineContainer}>
                                               <Input
-                                                ref={(input) => { this.textInput = input; }}
+                                                ref={ref => { this.input = ref }}
                                                 placeholder={'£0.00'}
                                                 inputStyle={styles.itemAmountBox}
                                                 placeholderTextColor="#000"
                                                 keyboardType='numeric'
-                                                onFocus={() => this.handleInputFocus(item)}
+                                                onFocus={() => this.handleInputFocus(item, index)}
                                                 onChangeText={item => this.handleOnChangeText(item)}
                                               />
                                               <Icon
