@@ -3,7 +3,6 @@ import { Text, View, FlatList, StyleSheet } from 'react-native';
 
 import { ListItem, Icon, Input } from 'react-native-elements';
 
-import { TextInputMask } from 'react-native-text-input-mask';
 
 export default class GroupList extends React.Component {
   constructor(props) {
@@ -70,13 +69,10 @@ export default class GroupList extends React.Component {
       // only numbers and letters are let into initialValue
       // however they magically show up when put into total????
       let initialValue = value
-      if (initialValue != '') {
-        let smallerInitialValue = initialValue.substr(1);
-      }
 
       if (isNaN(initialValue) || initialValue=='') {initialValue = 0}
 
-      itemies[itemIdx] = {...itemies[itemIdx], itemAmount: ("£" + initialValue)}
+      itemies[itemIdx] = {...itemies[itemIdx], itemAmount: (initialValue)}
       groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
 
       //console.log(JSON.stringify(groupies[groupIdx], null, 1))
@@ -85,7 +81,7 @@ export default class GroupList extends React.Component {
         key: x.key,
         groupTitle: x.title,
         groupTot: x.billItem.reduce(function (accumulator, currentValue) {
-          return parseFloat(accumulator) + parseFloat(currentValue.itemAmount.substr(1))
+          return parseFloat(accumulator) + parseFloat(currentValue.itemAmount)
         }, 0)
       }));
       groupies[groupIdx] = {...groupies[groupIdx], groupTotal: groupTotals[groupIdx].groupTot}
@@ -213,9 +209,10 @@ export default class GroupList extends React.Component {
               data={item.billItem}
               renderItem = {({ item, index }) => <View style={styles.itemBox}>
                                             <View style={styles.inlineContainer}>
+                                              <Text style={styles.currencySymbol}>£</Text>
                                               <Input
                                                 ref={ref => { this.input = ref }}
-                                                placeholder={'£0.00'}
+                                                placeholder={'0.00'}
                                                 inputStyle={styles.itemAmountBox}
                                                 placeholderTextColor="#000"
                                                 keyboardType='numeric'
@@ -272,6 +269,10 @@ export default class GroupList extends React.Component {
 const styles = StyleSheet.create({
   mainView: {
     marginTop: 30,
+  },
+  currencySymbol: {
+    fontSize: 18,
+    marginTop: 8,
   },
   billTotalFooter: {
     fontSize: 20,
