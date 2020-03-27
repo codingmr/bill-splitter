@@ -28,6 +28,7 @@
     "expo-asset": "~8.0.0",
     "expo-constants": "~8.0.0",
     "expo-font": "~8.0.0",
+    "expo-permissions": "~8.0.0",
     "expo-web-browser": "~8.0.0",
     "navigation-test-utils": "^0.1.18",
     "react": "~16.9.0",
