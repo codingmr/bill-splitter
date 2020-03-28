@@ -20,18 +20,19 @@ export default class GroupList extends React.Component {
     }
 
   }
-/*
+
   componentDidUpdate() {
-    // only focus textinput for first textinput box
+    /* only focus textinput for first textinput box
     console.log("selected group index: " + this.state.selectedGroupIndex)
     console.log("selected group length: " + this.state.Group.length)
 
     if (this.state.Group.length>0 && this.state.selectedGroupIndex!=-1 && this.state.selectedGroupIndex<this.state.Group.length){
       if (this.state.Group[this.state.selectedGroupIndex].billItem.length==1) {this.textInput.focus()}
     }
+    */
   }
-*/
-  newGroup = () => {
+
+  newGroup() {
     this.setState({count: this.state.count + 1})
     //this.setState({ Group: [...this.state.Group, ...[{key: this.state.count-1, title: 'Group ' + this.state.count, groupTotal: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] })
     // need it to scroll to end after the added entry
@@ -116,7 +117,6 @@ export default class GroupList extends React.Component {
 
     // UPDATE STATE AFTER SUM TOTALS
     this.updateBillTotal()
-
   }
 
   handleDeleteGroup = (item, index) => {
@@ -145,6 +145,7 @@ export default class GroupList extends React.Component {
 
     // Update bill total
     this.updateBillTotal()
+
   }
 
     updateBillTotal(){
@@ -161,11 +162,14 @@ export default class GroupList extends React.Component {
           return parseFloat(accumulator) + parseFloat(currentValue.groupTot)
         }, 0)
 
-        // ISSUE: the bill total updates but there is a minor delay
-        this.props.parentReference(sum)
+        this.callParentGiveSum(sum)
 
         return {billTotal: sum}
-      });
+      })
+    }
+
+    callParentGiveSum(sum){
+      this.props.parentReference(sum)
     }
 
   handleInputFocus = (item, index) => {
@@ -287,7 +291,7 @@ export default class GroupList extends React.Component {
                                   name='plus'
                                   type='font-awesome'
                                   color='#a3c1ad'
-                                  onPress={this.newGroup}
+                                  onPress={() => this.newGroup()}
                                 /></View>
           }
         />
