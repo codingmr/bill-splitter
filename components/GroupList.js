@@ -63,11 +63,12 @@ export default class GroupList extends React.Component {
       let groupIdx = this.state.selectedGroupIndex
       let itemIdx = this.state.selectedItemIndex
 
-
+      /*
       console.log("selected group index: " + this.state.selectedGroupIndex)
       console.log("selected group length: " + this.state.Group.length)
       console.log("groupIDX: " + groupIdx)
       console.log("count: " + this.state.count)
+      */
       let itemies = [...groupies[groupIdx].billItem ]
       // only numbers and letters are let into initialValue
       // however they magically show up when put into total????
@@ -75,7 +76,7 @@ export default class GroupList extends React.Component {
 
       if (isNaN(initialValue) || initialValue=='') {initialValue = 0}
 
-      itemies[itemIdx] = {...itemies[itemIdx], itemAmount: (initialValue)}
+      itemies[itemIdx] = {...itemies[itemIdx], itemAmount: initialValue}
       groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
 
       //console.log(JSON.stringify(groupies[groupIdx], null, 1))
