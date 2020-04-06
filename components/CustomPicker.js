@@ -10,7 +10,7 @@ export default function CustomPicker() {
     <View style={styles.centerMsg}>
       <Picker
         selectedValue={selectedValue}
-        style={{ alignSelf: 'stretch', marginRight: 5 }}
+        style={{ alignSelf: 'stretch', }}
         onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
         mode="dropdown"
       >

@@ -183,23 +183,29 @@ export default class GroupList extends React.Component {
     return (
       <View style={styles.mainView} >
         <View style={styles.titleBox}>
-          <Icon
-              size={26}
-              name='trash'
-              type='font-awesome'
-              color='#cc6666'
-              onPress={() => this.handleDeleteGroup(item, index)}
-              iconStyle={{padding: 5, paddingHorizontal: 10}}
-          />
-          <Text style={styles.itemTitle}> {item.title} </Text>
-          <Icon
-              size={26}
-              name='edit'
-              type='font-awesome'
-              color='#bab6b3'
-              iconStyle={{padding: 5, paddingHorizontal: 10}}
-              onPress={() => this.handleEditGroupName(item, index)}
-          />
+          <View style={{width: 100}}>
+            <Icon
+                size={23}
+                name='trash'
+                type='font-awesome'
+                color='#cc6666'
+                onPress={() => this.handleDeleteGroup(item, index)}
+                iconStyle={{padding: 5, paddingHorizontal: 10, alignSelf: 'flex-start'}}
+            />
+          </View>
+          <View style={{flexDirection: 'row'}}>
+            <Text style={styles.itemTitle}> {item.title} </Text>
+            <Icon
+                size={22}
+                name='edit'
+                type='font-awesome'
+                color='#bab6b3'
+                iconStyle={{paddingTop: 8}}
+                onPress={() => this.handleEditGroupName(item, index)}
+            />
+          </View>
+          <View style={{width: 100}}>
+          </View>
         </View>
 
         <View style={styles.groupBox}>
@@ -212,13 +218,24 @@ export default class GroupList extends React.Component {
           />
           <View style={styles.groupTotalBox}>
             <View style={{flexDirection: 'row'}}>
-              <Text>£20.00 per </Text>
               <Icon
-                size={20}
-                name='people'
+                  size={23}
+                  name='remove'
+                  color='red'
               />
-              <Text> with </Text>
-              <CustomPicker/>
+              <View style={{flexDirection: 'row'}}>
+                <Text>1</Text>
+                <Icon
+                    size={23}
+                    name='person'
+                    color='grey'
+                />
+              </View>
+              <Icon
+                  size={23}
+                  name='add'
+                  color='green'
+              />
             </View>
             <View>
               <Text style={{fontSize: 18}}>Group total: £{item.groupTotal}</Text>
@@ -297,7 +314,7 @@ const styles = StyleSheet.create({
   groupTotalBox: {
     backgroundColor: '#bfc1c2',
     paddingVertical: 10,
-    alignItems: 'flex-end',
+    alignItems: 'center',
     flexDirection: 'column',
     paddingHorizontal: 20,
   },
