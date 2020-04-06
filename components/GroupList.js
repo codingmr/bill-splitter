@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { Text, View, FlatList, StyleSheet } from 'react-native';
+import { Text, View, FlatList, StyleSheet, Picker } from 'react-native';
 
 import { ListItem, Icon, Input } from 'react-native-elements';
 
 import DialogInput from 'react-native-dialog-input';
+
+import CustomPicker from './CustomPicker';
 
 export default class GroupList extends React.Component {
   constructor(props) {
@@ -209,7 +211,18 @@ export default class GroupList extends React.Component {
               keyExtractor={(item, index) => 'item.id'+index}
           />
           <View style={styles.groupTotalBox}>
-            <Text style={{fontSize: 18}}>Group total: £{item.groupTotal}</Text>
+            <View style={{flexDirection: 'row'}}>
+              <Text>£20.00 per </Text>
+              <Icon
+                size={20}
+                name='people'
+              />
+              <Text> with </Text>
+              <CustomPicker/>
+            </View>
+            <View>
+              <Text style={{fontSize: 18}}>Group total: £{item.groupTotal}</Text>
+            </View>
           </View>
         </View>
       </View>
@@ -285,6 +298,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#bfc1c2',
     paddingVertical: 10,
     alignItems: 'flex-end',
+    flexDirection: 'column',
     paddingHorizontal: 20,
   },
   groupBox: {
