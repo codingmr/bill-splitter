@@ -21,17 +21,6 @@ export default class GroupList extends React.Component {
 
   }
 
-  componentDidUpdate() {
-    /* only focus textinput for first textinput box
-    console.log("selected group index: " + this.state.selectedGroupIndex)
-    console.log("selected group length: " + this.state.Group.length)
-
-    if (this.state.Group.length>0 && this.state.selectedGroupIndex!=-1 && this.state.selectedGroupIndex<this.state.Group.length){
-      if (this.state.Group[this.state.selectedGroupIndex].billItem.length==1) {this.textInput.focus()}
-    }
-    */
-  }
-
   newGroup() {
     this.setState({count: this.state.count + 1})
     //this.setState({ Group: [...this.state.Group, ...[{key: this.state.count-1, title: 'Group ' + this.state.count, groupTotal: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] })
@@ -85,7 +74,7 @@ export default class GroupList extends React.Component {
         key: x.key,
         groupTitle: x.title,
         groupTot: x.billItem.reduce(function (accumulator, currentValue) {
-          return parseFloat(accumulator) + parseFloat(currentValue.itemAmount)
+          return Math.round( ((parseFloat(accumulator) + parseFloat(currentValue.itemAmount)) + Number.EPSILON) * 100) / 100
         }, 0)
       }));
       groupies[groupIdx] = {...groupies[groupIdx], groupTotal: groupTotals[groupIdx].groupTot}
@@ -127,13 +116,6 @@ export default class GroupList extends React.Component {
       console.log(index)
       let filteredGroupies = groupies.slice(0, index).concat(groupies.slice(index + 1, groupies.length))
 
-/*
-      console.log("Starting Groupies: " + JSON.stringify(groupies, null, 1))
-      console.log("Ending groupies")
-      console.log("Starting filtered: " + JSON.stringify(filteredGroupies, null, 1))
-      console.log("Ending filtered")
-
-*/
       return {Group: filteredGroupies}
     })
     this.setState(prevState => {
