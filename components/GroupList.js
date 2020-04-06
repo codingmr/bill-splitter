@@ -23,11 +23,6 @@ export default class GroupList extends React.Component {
 
   newGroup() {
     this.setState({count: this.state.count + 1})
-    //this.setState({ Group: [...this.state.Group, ...[{key: this.state.count-1, title: 'Group ' + this.state.count, groupTotal: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] })
-    // need it to scroll to end after the added entry
-    // maybe scroll to index + 1
-    //this.groupList_Ref.scrollToIndex({ index: item.key, animated: true });
-
     this.groupList_Ref.scrollToEnd({animated: true });
 
     this.setState(prevState => {
@@ -35,11 +30,6 @@ export default class GroupList extends React.Component {
       return { Group: [...prevState.Group, ...[{key: this.state.count, title: 'Group ' + this.state.count, groupTotal: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] }
     })
 
-    //this.setState({selectedGroupIndex: this.state.selectedGroupIndex+1})
-
-    //console.log(JSON.stringify(this.state.Group, null, 1))
-    //console.log("selected index: " +this.state.selectedItemIndex)
-    //console.log("selected group: " + this.state.selectedGroupIndex)
   }
 
   handleOnChangeText(value) {
@@ -52,15 +42,7 @@ export default class GroupList extends React.Component {
       let groupIdx = this.state.selectedGroupIndex
       let itemIdx = this.state.selectedItemIndex
 
-      /*
-      console.log("selected group index: " + this.state.selectedGroupIndex)
-      console.log("selected group length: " + this.state.Group.length)
-      console.log("groupIDX: " + groupIdx)
-      console.log("count: " + this.state.count)
-      */
       let itemies = [...groupies[groupIdx].billItem ]
-      // only numbers and letters are let into initialValue
-      // however they magically show up when put into total????
       let initialValue = value
 
       if (isNaN(initialValue) || initialValue=='') {initialValue = 0}
@@ -68,25 +50,21 @@ export default class GroupList extends React.Component {
       itemies[itemIdx] = {...itemies[itemIdx], itemAmount: initialValue}
       groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
 
-      //console.log(JSON.stringify(groupies[groupIdx], null, 1))
       // sum group totals into object array
-      let groupTotals = groupies.map(x => ({
-        key: x.key,
-        groupTitle: x.title,
-        groupTot: x.billItem.reduce(function (accumulator, currentValue) {
+      let groupTotals = groupies.map(group => ({
+        key: group.key,
+        groupTitle: group.title,
+        groupTot: group.billItem.reduce(function (accumulator, currentValue) {
           return Math.round( ((parseFloat(accumulator) + parseFloat(currentValue.itemAmount)) + Number.EPSILON) * 100) / 100
         }, 0)
       }));
       groupies[groupIdx] = {...groupies[groupIdx], groupTotal: groupTotals[groupIdx].groupTot}
 
       // ADD BOX
-      console.log("value: " +value)
       if (value != '' && (itemies.length-1 == itemIdx)) {
 
           itemies = [...itemies, {id: itemies.length, itemAmount: '0.00', itemIcon: 'restaurant'}]
           groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
-
-          //this.itemList_Ref.scrollToEnd({ animated: true });
       }
       // DELETE BOX
       else if (itemies.length-1 != itemIdx
@@ -99,9 +77,7 @@ export default class GroupList extends React.Component {
           // and selected inputbox is one from the last inputbox
           itemies.pop()
           groupies[groupIdx] = {...groupies[groupIdx], billItem: itemies}
-
       }
-      console.log(JSON.stringify(groupies[groupIdx], null, 1))
       return {Group: groupies}
     })
 
@@ -112,8 +88,6 @@ export default class GroupList extends React.Component {
   handleDeleteGroup = (item, index) => {
     this.setState(prevState => {
       let groupies = [...prevState.Group]
-
-      console.log(index)
       let filteredGroupies = groupies.slice(0, index).concat(groupies.slice(index + 1, groupies.length))
 
       return {Group: filteredGroupies}
@@ -122,27 +96,25 @@ export default class GroupList extends React.Component {
       return {count: prevState.count-1}
     })
 
-    // FEATURE: could set the index to the previous one
     this.setState({selectedGroupIndex: 0})
     this.setState({selectedItemIndex: 0})
 
     // Update bill total
     this.updateBillTotal()
-
   }
 
     updateBillTotal(){
       this.setState(prevState => {
         let groupies = [...prevState.Group]
 
-        let groupTotals = groupies.map(x => ({
-          key: x.key,
-          groupTitle: x.title,
-          groupTot: x.groupTotal
+        let groupTotals = groupies.map(group => ({
+          key: group.key,
+          groupTitle: group.title,
+          groupTot: group.groupTotal
         }))
 
         let sum = groupTotals.reduce(function (accumulator, currentValue) {
-          return parseFloat(accumulator) + parseFloat(currentValue.groupTot)
+          return Math.round( ((parseFloat(accumulator) + parseFloat(currentValue.groupTot)) + Number.EPSILON) * 100) / 100
         }, 0)
 
         this.callParentGiveSum(sum)
@@ -156,23 +128,16 @@ export default class GroupList extends React.Component {
     }
 
   handleInputFocus = (item, index) => {
-    console.log("onInputFocus: True")
-
     this.setState({selectedItemIndex: index})
-    //this.itemList_Ref.scrollToIndex({ index: item.id, animated: true });
   }
 
   handleGroupFocus = (item, index) => {
-    console.log("onGroupFocus: True")
     this.setState({selectedGroupIndex: index})
-    //console.log("groupIndex: " + index)
-    //console.log("group: " + JSON.stringify(item, null, 1))
   }
 
   sendInput(inputText) {
     let groupIdx = this.state.selectedGroupIndex
 
-    console.log("Inputtest: " + inputText)
     this.setState({isDialogVisible: false})
     this.setState(prevState => {
       let groupies = [...prevState.Group]
@@ -186,6 +151,30 @@ export default class GroupList extends React.Component {
   handleEditGroupName(item, index) {
     this.setState({selectedGroupIndex: index})
     this.setState({isDialogVisible: true})
+  }
+
+  renderGroupItemInput = ({item, index}) => {
+    return (
+      <View style={styles.itemBox}>
+        <View style={styles.inlineContainer}>
+          <Text style={styles.currencySymbol}>£</Text>
+          <Input
+            ref={ref => { this.input = ref }}
+            placeholder={'0.00'}
+            inputStyle={styles.itemAmountBox}
+            placeholderTextColor="#000"
+            keyboardType='numeric'
+            onFocus={() => this.handleInputFocus(item, index)}
+            onChangeText={item => this.handleOnChangeText(item)}
+          />
+          <Icon
+            name={item.itemIcon}
+            type='Ionicon'
+            iconStyle={styles.itemIconBox}
+          />
+        </View>
+      </View>
+    )
   }
 
   renderGroupItem = ({item, index}) => {
@@ -216,25 +205,7 @@ export default class GroupList extends React.Component {
               keyboardDismissMode='on-drag'
               onFocus={() => this.handleGroupFocus(item, index)}
               data={item.billItem}
-              renderItem = {({ item, index }) => <View style={styles.itemBox}>
-                                            <View style={styles.inlineContainer}>
-                                              <Text style={styles.currencySymbol}>£</Text>
-                                              <Input
-                                                ref={ref => { this.input = ref }}
-                                                placeholder={'0.00'}
-                                                inputStyle={styles.itemAmountBox}
-                                                placeholderTextColor="#000"
-                                                keyboardType='numeric'
-                                                onFocus={() => this.handleInputFocus(item, index)}
-                                                onChangeText={item => this.handleOnChangeText(item)}
-                                              />
-                                              <Icon
-                                                name={item.itemIcon}
-                                                type='Ionicon'
-                                                iconStyle={styles.itemIconBox}
-                                              />
-                                            </View>
-                                          </View>}
+              renderItem = {this.renderGroupItemInput}
               keyExtractor={(item, index) => 'item.id'+index}
           />
           <View style={styles.groupTotalBox}>
