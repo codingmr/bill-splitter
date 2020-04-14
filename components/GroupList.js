@@ -29,7 +29,7 @@ export default class GroupList extends React.Component {
 
     this.setState(prevState => {
       // set focus to first textbox in the correct group
-      return { Group: [...prevState.Group, ...[{key: this.state.count, title: 'Group ' + this.state.count, groupTotal: 0, numberPersons: 1, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] }
+      return { Group: [...prevState.Group, ...[{key: this.state.count, title: 'Group ' + this.state.count, groupTotal: 0, numberPersons: 1, tipPercentage: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] }
     })
 
   }
@@ -148,6 +148,28 @@ export default class GroupList extends React.Component {
     })
   }
 
+  increasePercentage(index) {
+    let groupIdx = index
+    this.setState(prevState => {
+      let groupies = [...prevState.Group]
+      let prevPercentage = groupies[groupIdx].tipPercentage
+      groupies[groupIdx] = {...groupies[groupIdx], tipPercentage: (prevPercentage+1)}
+
+      return {Group: groupies}
+    })
+  }
+
+  decreasePercentage(index) {
+    let groupIdx = index
+    this.setState(prevState => {
+      let groupies = [...prevState.Group]
+      let prevPercentage = groupies[groupIdx].tipPercentage
+      groupies[groupIdx] = {...groupies[groupIdx], tipPercentage: (prevPercentage-1)}
+
+      return {Group: groupies}
+    })
+  }
+
   removePerson(index) {
     let groupIdx = index
     this.setState(prevState => {
@@ -242,19 +264,19 @@ export default class GroupList extends React.Component {
             <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
               <View style={{flexDirection: 'row'}}>
                 <Icon
-                    size={23}
+                    size={20}
                     name='remove'
                     color='red'
                     onPress={()=>this.removePerson(index)}
                 />
                 <Text>{item.numberPersons}</Text>
                 <Icon
-                    size={23}
+                    size={20}
                     name='person'
                     color='grey'
                 />
                 <Icon
-                    size={23}
+                    size={20}
                     name='add'
                     color='green'
                     onPress={()=>this.addPerson(index)}
@@ -262,17 +284,17 @@ export default class GroupList extends React.Component {
               </View>
               <View style={{flexDirection: 'row'}}>
                 <Icon
-                    size={23}
+                    size={20}
                     name='remove'
                     color='red'
-                    onPress={()=>this.removePerson(index)}
+                    onPress={()=>this.decreasePercentage(index)}
                 />
                 <Text>{item.tipPercentage} %</Text>
                 <Icon
-                    size={23}
+                    size={20}
                     name='add'
                     color='green'
-                    onPress={()=>this.addPerson(index)}
+                    onPress={()=>this.increasePercentage(index)}
                 />
               </View>
             </View>
