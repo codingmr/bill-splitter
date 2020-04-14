@@ -18,13 +18,19 @@ export default class HomeScreen extends React.Component {
 
     this.state = {
       billTotal: 0,
+      billTip: 0,
     }
 
   }
 
-  parentMethod(childData) {
+  parentMethod(childData, childData2) {
     console.log(childData)
-    this.setState({billTotal: childData})
+    if (childData!=-1){
+      this.setState({billTotal: childData})
+    }
+    if (childData2!=-1) {
+      this.setState({billTip: childData2})
+    }
   }
 
   render() {
@@ -34,8 +40,8 @@ export default class HomeScreen extends React.Component {
                      parentReference={this.parentMethod.bind(this)}/>
 
           <View style={styles.billTotalFooter}>
-            <Text style={{fontSize: 27, padding: 5}}>Total:</Text>
-            <Text style={{fontSize: 27, padding: 5, marginRight: 30}}>£{this.state.billTotal}</Text>
+            <Text style={{fontSize: 18}}>£{this.state.billTotal}</Text>
+            <Text style={{color: 'grey', fontSize: 16, paddingTop: 1}}>  + £{this.state.billTip}</Text>
           </View>
 
       </SafeAreaView>
@@ -54,8 +60,7 @@ const styles = StyleSheet.create({
   billTotalFooter: {
     flexDirection: 'row',
     fontSize: 20,
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     backgroundColor: '#fff',
     shadowColor: "#000",
     shadowOffset: {

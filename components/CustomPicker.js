@@ -4,19 +4,19 @@ import { RectButton, ScrollView } from 'react-native-gesture-handler';
 
 import { ListItem, Icon, Input } from 'react-native-elements';
 
-export default function SettingsScreen() {
-  const [selectedValue, setSelectedValue] = useState("gbp");
+export default function CustomPicker() {
+  const [selectedValue, setSelectedValue] = useState("one");
   return (
     <View style={styles.centerMsg}>
-      <Text>Choose a display currency:</Text>
       <Picker
         selectedValue={selectedValue}
-        style={{ height: 50, alignSelf: 'stretch' }}
+        style={{ alignSelf: 'stretch', }}
         onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+        mode="dropdown"
       >
-        <Picker.Item label="($) Dollar" value="dollar" />
-        <Picker.Item label="(£) Great British Pound" value="gbp" />
-        <Picker.Item label="(€) Euro" value="euro" />
+        <Picker.Item label="1%" value="one" />
+        <Picker.Item label="2%" value="2" />
+        <Picker.Item label="3%" value="3" />
       </Picker>
     </View>
   );
@@ -26,7 +26,6 @@ const styles = StyleSheet.create({
 
   centerMsg: {
     flex: 1,
-    paddingHorizontal: 10,
-    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

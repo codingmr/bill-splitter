@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
-import { Text, View, FlatList, StyleSheet } from 'react-native';
+import { Text, View, FlatList, StyleSheet, Picker } from 'react-native';
 
 import { ListItem, Icon, Input } from 'react-native-elements';
 
 import DialogInput from 'react-native-dialog-input';
+
+import CustomPicker from './CustomPicker';
+
+import ItemTypePicker from './ItemTypePicker';
 
 export default class GroupList extends React.Component {
   constructor(props) {
@@ -27,7 +31,7 @@ export default class GroupList extends React.Component {
 
     this.setState(prevState => {
       // set focus to first textbox in the correct group
-      return { Group: [...prevState.Group, ...[{key: this.state.count, title: 'Group ' + this.state.count, groupTotal: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] }
+      return { Group: [...prevState.Group, ...[{key: this.state.count, title: 'Group ' + this.state.count, groupTotal: 0, numberPersons: 1, tipPercentage: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] }
     })
 
   }
@@ -110,21 +114,21 @@ export default class GroupList extends React.Component {
         let groupTotals = groupies.map(group => ({
           key: group.key,
           groupTitle: group.title,
-          groupTot: group.groupTotal
+          groupTot: group.groupTotal,
         }))
 
-        let sum = groupTotals.reduce(function (accumulator, currentValue) {
+        let sumGroupTot = groupTotals.reduce(function (accumulator, currentValue) {
           return Math.round( ((parseFloat(accumulator) + parseFloat(currentValue.groupTot)) + Number.EPSILON) * 100) / 100
         }, 0)
 
-        this.callParentGiveSum(sum)
+        this.callParentGiveSum(sumGroupTot, -1)
 
-        return {billTotal: sum}
+        return {billTotal: sumGroupTot}
       })
     }
 
-    callParentGiveSum(sum){
-      this.props.parentReference(sum)
+    callParentGiveSum(sumGroupTot, sumGroupTotTip){
+      this.props.parentReference(sumGroupTot, sumGroupTotTip)
     }
 
   handleInputFocus = (item, index) => {
@@ -133,6 +137,78 @@ export default class GroupList extends React.Component {
 
   handleGroupFocus = (item, index) => {
     this.setState({selectedGroupIndex: index})
+  }
+
+  addPerson(index) {
+    let groupIdx = index
+    this.setState(prevState => {
+      let groupies = [...prevState.Group]
+      let prevNumberPersons = groupies[groupIdx].numberPersons
+      groupies[groupIdx] = {...groupies[groupIdx], numberPersons: (prevNumberPersons+1)}
+
+      return {Group: groupies}
+    })
+  }
+
+  increasePercentage(index) {
+    let groupIdx = index
+    this.setState(prevState => {
+      let groupies = [...prevState.Group]
+      let prevPercentage = groupies[groupIdx].tipPercentage
+
+      groupies[groupIdx] = {...groupies[groupIdx], tipPercentage: (prevPercentage+1)}
+
+      let groupTotals = groupies.map(group => ({
+        key: group.key,
+        groupTot: group.groupTotal,
+        groupTotTip: group.tipPercentage
+      }))
+
+      let sumGroupTotalTips = groupTotals.reduce(function (accumulator, currentValue) {
+        return Math.round( ((parseFloat(accumulator) + parseFloat(currentValue.groupTot*(currentValue.groupTotTip/100))) + Number.EPSILON) * 100) / 100
+      }, 0)
+
+      this.callParentGiveSum(-1, sumGroupTotalTips)
+
+      return {Group: groupies}
+    })
+  }
+
+  decreasePercentage(index) {
+    let groupIdx = index
+    this.setState(prevState => {
+      let groupies = [...prevState.Group]
+      let prevPercentage = groupies[groupIdx].tipPercentage
+      groupies[groupIdx] = {...groupies[groupIdx], tipPercentage: (prevPercentage-1)}
+
+      let groupTotals = groupies.map(group => ({
+        key: group.key,
+        groupTot: group.groupTotal,
+        groupTotTip: group.tipPercentage
+      }))
+
+      let sumGroupTotalTips = groupTotals.reduce(function (accumulator, currentValue) {
+        return Math.round( ((parseFloat(accumulator) + parseFloat(currentValue.groupTot*(currentValue.groupTotTip/100))) + Number.EPSILON) * 100) / 100
+      }, 0)
+
+      this.callParentGiveSum(-1, sumGroupTotalTips)
+
+      return {Group: groupies}
+    })
+  }
+
+  removePerson(index) {
+    let groupIdx = index
+    this.setState(prevState => {
+      let groupies = [...prevState.Group]
+      let prevNumberPersons = groupies[groupIdx].numberPersons
+      groupies[groupIdx] = {...groupies[groupIdx], numberPersons: (prevNumberPersons-1)}
+
+      return {Group: groupies}
+    })
+  }
+
+  updateIndex = () => {
   }
 
   sendInput(inputText) {
@@ -157,21 +233,24 @@ export default class GroupList extends React.Component {
     return (
       <View style={styles.itemBox}>
         <View style={styles.inlineContainer}>
-          <Text style={styles.currencySymbol}>£</Text>
-          <Input
-            ref={ref => { this.input = ref }}
-            placeholder={'0.00'}
-            inputStyle={styles.itemAmountBox}
-            placeholderTextColor="#000"
-            keyboardType='numeric'
-            onFocus={() => this.handleInputFocus(item, index)}
-            onChangeText={item => this.handleOnChangeText(item)}
-          />
-          <Icon
-            name={item.itemIcon}
-            type='Ionicon'
-            iconStyle={styles.itemIconBox}
-          />
+          <View style={{width: '65%', flexDirection: 'row'}}>
+
+            <Text style={styles.currencySymbol}>£</Text>
+            <Input
+              ref={ref => { this.input = ref }}
+              placeholder={'0.00'}
+              inputStyle={styles.itemAmountBox}
+              placeholderTextColor="#000"
+              keyboardType='numeric'
+              onFocus={() => this.handleInputFocus(item, index)}
+              onChangeText={item => this.handleOnChangeText(item)}
+            />
+          </View>
+
+          <View style={{width: '35%'}}>
+            <ItemTypePicker/>
+
+          </View>
         </View>
       </View>
     )
@@ -181,23 +260,29 @@ export default class GroupList extends React.Component {
     return (
       <View style={styles.mainView} >
         <View style={styles.titleBox}>
-          <Icon
-              size={26}
-              name='trash'
-              type='font-awesome'
-              color='#cc6666'
-              onPress={() => this.handleDeleteGroup(item, index)}
-              iconStyle={{padding: 5, paddingHorizontal: 10}}
-          />
-          <Text style={styles.itemTitle}> {item.title} </Text>
-          <Icon
-              size={26}
-              name='edit'
-              type='font-awesome'
-              color='#bab6b3'
-              iconStyle={{padding: 5, paddingHorizontal: 10}}
-              onPress={() => this.handleEditGroupName(item, index)}
-          />
+          <View style={{width: 100}}>
+            <Icon
+                size={23}
+                name='trash'
+                type='font-awesome'
+                color='#cc6666'
+                onPress={() => this.handleDeleteGroup(item, index)}
+                iconStyle={{padding: 5, paddingHorizontal: 10, alignSelf: 'flex-start'}}
+            />
+          </View>
+          <View style={{flexDirection: 'row'}}>
+            <Text style={styles.itemTitle}> {item.title} </Text>
+            <Icon
+                size={22}
+                name='edit'
+                type='font-awesome'
+                color='#bab6b3'
+                iconStyle={{paddingTop: 8}}
+                onPress={() => this.handleEditGroupName(item, index)}
+            />
+          </View>
+          <View style={{width: 100}}>
+          </View>
         </View>
 
         <View style={styles.groupBox}>
@@ -208,8 +293,57 @@ export default class GroupList extends React.Component {
               renderItem = {this.renderGroupItemInput}
               keyExtractor={(item, index) => 'item.id'+index}
           />
+          <View style={{alignItems: 'center'}}>
+            <Text style={{fontSize: 18}}>£{item.groupTotal}</Text>
+          </View>
           <View style={styles.groupTotalBox}>
-            <Text style={{fontSize: 18}}>Group total: £{item.groupTotal}</Text>
+            <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+              <View style={{flexDirection: 'row'}}>
+                <Icon
+                    size={20}
+                    name='remove'
+                    color='red'
+                    onPress={()=>this.removePerson(index)}
+                />
+                <Text>{item.numberPersons}</Text>
+                <Icon
+                    size={20}
+                    name='person'
+                    color='grey'
+                />
+                <Icon
+                    size={20}
+                    name='add'
+                    color='green'
+                    onPress={()=>this.addPerson(index)}
+                />
+              </View>
+              <View style={{flexDirection: 'column'}}>
+                <View style={{flexDirection: 'row'}}>
+                  <Icon
+                      size={20}
+                      name='remove'
+                      color='red'
+                      onPress={()=>this.decreasePercentage(index)}
+                  />
+                  <Text>{item.tipPercentage} %</Text>
+                  <Icon
+                      size={20}
+                      name='add'
+                      color='green'
+                      onPress={()=>this.increasePercentage(index)}
+                  />
+                </View>
+                <View style={{alignItems: 'flex-end'}}>
+                  <Text>+ £{Math.round( ((item.groupTotal * (item.tipPercentage/100)) + Number.EPSILON) * 100 )/ 100}</Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={{alignItems: 'center'}}>
+              <Text style={{fontSize: 18}}>£{Math.round( (( (item.groupTotal/item.numberPersons) * (1+ (item.tipPercentage/100) ) ) + Number.EPSILON) * 100 )/ 100 } each</Text>
+            </View>
+
           </View>
         </View>
       </View>
@@ -284,7 +418,7 @@ const styles = StyleSheet.create({
   groupTotalBox: {
     backgroundColor: '#bfc1c2',
     paddingVertical: 10,
-    alignItems: 'flex-end',
+    flexDirection: 'column',
     paddingHorizontal: 20,
   },
   groupBox: {
@@ -304,12 +438,11 @@ const styles = StyleSheet.create({
   },
   inlineContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    paddingHorizontal: '20%',
+    paddingHorizontal: 10,
   },
   itemBox: {
     backgroundColor: '#ededed',
-    marginBottom: 10,
+    marginLeft: 10,
   },
   titleBox: {
     width: '90%',
@@ -335,6 +468,7 @@ const styles = StyleSheet.create({
   },
   itemIconBox: {
     marginTop: 12,
+    paddingHorizontal: 5,
   },
   itemAmountBox: {
     color: '#424142',
