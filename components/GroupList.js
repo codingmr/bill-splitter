@@ -183,6 +183,9 @@ export default class GroupList extends React.Component {
     })
   }
 
+  updateIndex = () => {
+  }
+
   sendInput(inputText) {
     let groupIdx = this.state.selectedGroupIndex
 
@@ -220,7 +223,8 @@ export default class GroupList extends React.Component {
           </View>
 
           <View style={{width: '35%'}}>
-            <ItemTypePicker itemIcon={item.itemIcon}/>
+            <ItemTypePicker/>
+
           </View>
         </View>
       </View>
