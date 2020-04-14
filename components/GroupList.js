@@ -7,6 +7,8 @@ import DialogInput from 'react-native-dialog-input';
 
 import CustomPicker from './CustomPicker';
 
+import ItemTypePicker from './ItemTypePicker';
+
 export default class GroupList extends React.Component {
   constructor(props) {
     super(props);
@@ -203,21 +205,23 @@ export default class GroupList extends React.Component {
     return (
       <View style={styles.itemBox}>
         <View style={styles.inlineContainer}>
-          <Text style={styles.currencySymbol}>£</Text>
-          <Input
-            ref={ref => { this.input = ref }}
-            placeholder={'0.00'}
-            inputStyle={styles.itemAmountBox}
-            placeholderTextColor="#000"
-            keyboardType='numeric'
-            onFocus={() => this.handleInputFocus(item, index)}
-            onChangeText={item => this.handleOnChangeText(item)}
-          />
-          <Icon
-            name={item.itemIcon}
-            type='Ionicon'
-            iconStyle={styles.itemIconBox}
-          />
+          <View style={{width: '65%', flexDirection: 'row'}}>
+
+            <Text style={styles.currencySymbol}>£</Text>
+            <Input
+              ref={ref => { this.input = ref }}
+              placeholder={'0.00'}
+              inputStyle={styles.itemAmountBox}
+              placeholderTextColor="#000"
+              keyboardType='numeric'
+              onFocus={() => this.handleInputFocus(item, index)}
+              onChangeText={item => this.handleOnChangeText(item)}
+            />
+          </View>
+
+          <View style={{width: '35%'}}>
+            <ItemTypePicker itemIcon={item.itemIcon}/>
+          </View>
         </View>
       </View>
     )
@@ -395,12 +399,11 @@ const styles = StyleSheet.create({
   },
   inlineContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    paddingHorizontal: '20%',
+    paddingHorizontal: 10,
   },
   itemBox: {
     backgroundColor: '#ededed',
-    marginBottom: 10,
+    margin: 10,
   },
   titleBox: {
     width: '90%',
@@ -426,6 +429,7 @@ const styles = StyleSheet.create({
   },
   itemIconBox: {
     marginTop: 12,
+    paddingHorizontal: 5,
   },
   itemAmountBox: {
     color: '#424142',
