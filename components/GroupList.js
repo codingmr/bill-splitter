@@ -113,7 +113,7 @@ export default class GroupList extends React.Component {
 
         let groupTotals = groupies.map(group => ({
           key: group.key,
-          groupTitle: group.title,
+          groupTotTip: group.tipPercentage,
           groupTot: group.groupTotal,
         }))
 
@@ -121,7 +121,11 @@ export default class GroupList extends React.Component {
           return Math.round( ((parseFloat(accumulator) + parseFloat(currentValue.groupTot)) + Number.EPSILON) * 100) / 100
         }, 0)
 
-        this.callParentGiveSum(sumGroupTot, -1)
+        let sumGroupTotalTips = groupTotals.reduce(function (accumulator, currentValue) {
+          return Math.round( ((parseFloat(accumulator) + parseFloat(currentValue.groupTot*(currentValue.groupTotTip/100))) + Number.EPSILON) * 100) / 100
+        }, 0)
+
+        this.callParentGiveSum(sumGroupTot, sumGroupTotalTips)
 
         return {billTotal: sumGroupTot}
       })
