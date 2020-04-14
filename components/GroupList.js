@@ -29,7 +29,7 @@ export default class GroupList extends React.Component {
 
     this.setState(prevState => {
       // set focus to first textbox in the correct group
-      return { Group: [...prevState.Group, ...[{key: this.state.count, title: 'Group ' + this.state.count, groupTotal: 0, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] }
+      return { Group: [...prevState.Group, ...[{key: this.state.count, title: 'Group ' + this.state.count, groupTotal: 0, numberPersons: 1, billItem: [{id: 0, itemAmount: '0.00', itemIcon: 'restaurant'}]}]] }
     })
 
   }
@@ -137,6 +137,28 @@ export default class GroupList extends React.Component {
     this.setState({selectedGroupIndex: index})
   }
 
+  addPerson(index) {
+    let groupIdx = index
+    this.setState(prevState => {
+      let groupies = [...prevState.Group]
+      let prevNumberPersons = groupies[groupIdx].numberPersons
+      groupies[groupIdx] = {...groupies[groupIdx], numberPersons: (prevNumberPersons+1)}
+
+      return {Group: groupies}
+    })
+  }
+
+  removePerson(index) {
+    let groupIdx = index
+    this.setState(prevState => {
+      let groupies = [...prevState.Group]
+      let prevNumberPersons = groupies[groupIdx].numberPersons
+      groupies[groupIdx] = {...groupies[groupIdx], numberPersons: (prevNumberPersons-1)}
+
+      return {Group: groupies}
+    })
+  }
+
   sendInput(inputText) {
     let groupIdx = this.state.selectedGroupIndex
 
@@ -217,25 +239,42 @@ export default class GroupList extends React.Component {
               keyExtractor={(item, index) => 'item.id'+index}
           />
           <View style={styles.groupTotalBox}>
-            <View style={{flexDirection: 'row'}}>
-              <Icon
-                  size={23}
-                  name='remove'
-                  color='red'
-              />
+            <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
               <View style={{flexDirection: 'row'}}>
-                <Text>1</Text>
+                <Icon
+                    size={23}
+                    name='remove'
+                    color='red'
+                    onPress={()=>this.removePerson(index)}
+                />
+                <Text>{item.numberPersons}</Text>
                 <Icon
                     size={23}
                     name='person'
                     color='grey'
                 />
+                <Icon
+                    size={23}
+                    name='add'
+                    color='green'
+                    onPress={()=>this.addPerson(index)}
+                />
               </View>
-              <Icon
-                  size={23}
-                  name='add'
-                  color='green'
-              />
+              <View style={{flexDirection: 'row'}}>
+                <Icon
+                    size={23}
+                    name='remove'
+                    color='red'
+                    onPress={()=>this.removePerson(index)}
+                />
+                <Text>{item.tipPercentage} %</Text>
+                <Icon
+                    size={23}
+                    name='add'
+                    color='green'
+                    onPress={()=>this.addPerson(index)}
+                />
+              </View>
             </View>
             <View>
               <Text style={{fontSize: 18}}>Group total: £{item.groupTotal}</Text>
@@ -314,7 +353,6 @@ const styles = StyleSheet.create({
   groupTotalBox: {
     backgroundColor: '#bfc1c2',
     paddingVertical: 10,
-    alignItems: 'center',
     flexDirection: 'column',
     paddingHorizontal: 20,
   },
