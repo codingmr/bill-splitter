@@ -268,6 +268,9 @@ export default class GroupList extends React.Component {
               renderItem = {this.renderGroupItemInput}
               keyExtractor={(item, index) => 'item.id'+index}
           />
+          <View style={{alignItems: 'center'}}>
+            <Text style={{fontSize: 18}}>£{item.groupTotal}</Text>
+          </View>
           <View style={styles.groupTotalBox}>
             <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
               <View style={{flexDirection: 'row'}}>
@@ -290,25 +293,32 @@ export default class GroupList extends React.Component {
                     onPress={()=>this.addPerson(index)}
                 />
               </View>
-              <View style={{flexDirection: 'row'}}>
-                <Icon
-                    size={20}
-                    name='remove'
-                    color='red'
-                    onPress={()=>this.decreasePercentage(index)}
-                />
-                <Text>{item.tipPercentage} %</Text>
-                <Icon
-                    size={20}
-                    name='add'
-                    color='green'
-                    onPress={()=>this.increasePercentage(index)}
-                />
+              <View style={{flexDirection: 'column'}}>
+                <View style={{flexDirection: 'row'}}>
+                  <Icon
+                      size={20}
+                      name='remove'
+                      color='red'
+                      onPress={()=>this.decreasePercentage(index)}
+                  />
+                  <Text>{item.tipPercentage} %</Text>
+                  <Icon
+                      size={20}
+                      name='add'
+                      color='green'
+                      onPress={()=>this.increasePercentage(index)}
+                  />
+                </View>
+                <View style={{alignItems: 'flex-end'}}>
+                  <Text>+ £{Math.round( ((item.groupTotal * (item.tipPercentage/100)) + Number.EPSILON) * 100 )/ 100}</Text>
+                </View>
               </View>
             </View>
-            <View>
-              <Text style={{fontSize: 18}}>Group total: £{item.groupTotal}</Text>
+
+            <View style={{alignItems: 'center'}}>
+              <Text style={{fontSize: 18}}>£{Math.round( (( (item.groupTotal/item.numberPersons) * (1+ (item.tipPercentage/100) ) ) + Number.EPSILON) * 100 )/ 100 } each</Text>
             </View>
+
           </View>
         </View>
       </View>
@@ -407,7 +417,7 @@ const styles = StyleSheet.create({
   },
   itemBox: {
     backgroundColor: '#ededed',
-    margin: 10,
+    marginLeft: 10,
   },
   titleBox: {
     width: '90%',
