@@ -114,21 +114,21 @@ export default class GroupList extends React.Component {
         let groupTotals = groupies.map(group => ({
           key: group.key,
           groupTitle: group.title,
-          groupTot: group.groupTotal
+          groupTot: group.groupTotal,
         }))
 
-        let sum = groupTotals.reduce(function (accumulator, currentValue) {
+        let sumGroupTot = groupTotals.reduce(function (accumulator, currentValue) {
           return Math.round( ((parseFloat(accumulator) + parseFloat(currentValue.groupTot)) + Number.EPSILON) * 100) / 100
         }, 0)
 
-        this.callParentGiveSum(sum)
+        this.callParentGiveSum(sumGroupTot, -1)
 
-        return {billTotal: sum}
+        return {billTotal: sumGroupTot}
       })
     }
 
-    callParentGiveSum(sum){
-      this.props.parentReference(sum)
+    callParentGiveSum(sumGroupTot, sumGroupTotTip){
+      this.props.parentReference(sumGroupTot, sumGroupTotTip)
     }
 
   handleInputFocus = (item, index) => {
@@ -155,7 +155,30 @@ export default class GroupList extends React.Component {
     this.setState(prevState => {
       let groupies = [...prevState.Group]
       let prevPercentage = groupies[groupIdx].tipPercentage
+
       groupies[groupIdx] = {...groupies[groupIdx], tipPercentage: (prevPercentage+1)}
+
+
+      let groupTotals = groupies.map(group => ({
+        key: group.key,
+        groupTitle: group.title,
+        groupTot: group.groupTotal,
+        groupTotTip: group.tipPercentage
+      }))
+
+
+
+      // error must apply the percentage to the number before suming the values together
+
+      let sumGroupTotalTips = groupTotals.reduce(function (accumulator, currentValue) {
+        return Math.round( ((parseFloat(accumulator) + parseFloat(currentValue.groupTot*(currentValue.groupTotTip/100))) + Number.EPSILON) * 100) / 100
+      }, 0)
+      console.log("sum: " + sumGroupTotalTips)
+
+      // apply every group tip to every group total
+
+
+      this.callParentGiveSum(-1, sumGroupTotalTips)
 
       return {Group: groupies}
     })
