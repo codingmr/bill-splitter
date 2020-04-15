@@ -341,7 +341,7 @@ export default class GroupList extends React.Component {
                       color='red'
                       onPress={()=>this.decreasePercentage(index)}
                   />
-                  <Text>{item.tipPercentage} %</Text>
+                  <Text style={{color: 'black'}}>{item.tipPercentage} %</Text>
                   <Icon
                       size={10}
                       reverse
@@ -350,8 +350,8 @@ export default class GroupList extends React.Component {
                       onPress={()=>this.increasePercentage(index)}
                   />
                 </View>
-                <View style={{alignItems: 'flex-end'}}>
-                  <Text>+ £{Math.round( ((item.groupTotal * (item.tipPercentage/100)) + Number.EPSILON) * 100 )/ 100}</Text>
+                <View style={{alignItems: 'center', marginTop: -10}}>
+                  <Text style={{color: 'grey'}}>+ £{Math.round( ((item.groupTotal * (item.tipPercentage/100)) + Number.EPSILON) * 100 )/ 100}</Text>
                 </View>
               </View>
             </View>
