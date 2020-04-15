@@ -264,28 +264,36 @@ export default class GroupList extends React.Component {
     return (
       <View style={styles.mainView} >
         <View style={styles.titleBox}>
-          <View style={{width: 100}}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Icon
-                size={23}
-                name='trash'
-                type='font-awesome'
-                color='#cc6666'
-                onPress={() => this.handleDeleteGroup(item, index)}
-                iconStyle={{padding: 5, paddingHorizontal: 10, alignSelf: 'flex-start'}}
+              size={23}
+              name='trash'
+              type='font-awesome'
+              color='#cc6666'
+              onPress={() => this.handleDeleteGroup(item, index)}
+              iconStyle={{paddingHorizontal: 5}}
             />
           </View>
-          <View style={{flexDirection: 'row'}}>
-            <Text style={styles.itemTitle}> {item.title} </Text>
-            <Icon
-                size={22}
-                name='edit'
-                type='font-awesome'
-                color='#bab6b3'
-                iconStyle={{paddingTop: 8}}
-                onPress={() => this.handleEditGroupName(item, index)}
-            />
+          <View style={styles.itemTitle}>
+            <Text style={styles.itemTitleText}> {item.title} </Text>
           </View>
-          <View style={{width: 100}}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text style={{fontSize: 18, color: 'white'}}>{item.numberPersons}</Text>
+            <Icon
+              size={18}
+              name='md-person'
+              type='ionicon'
+              color='white'
+              iconStyle={{paddingHorizontal: 5}}
+            />
+            <Icon
+              size={22}
+              name='edit'
+              type='font-awesome'
+              color='#bab6b3'
+              iconStyle={{paddingHorizontal: 5}}
+              onPress={() => this.handleEditGroupName(item, index)}
+            />
           </View>
         </View>
 
@@ -301,38 +309,42 @@ export default class GroupList extends React.Component {
             <Text style={{fontSize: 18}}>£{item.groupTotal}</Text>
           </View>
           <View style={styles.groupTotalBox}>
-            <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-              <View style={{flexDirection: 'row'}}>
+            <View style={{justifyContent: 'space-between', flexDirection: 'row', alignItems: 'flex-start'}}>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Icon
-                    size={20}
+                    size={10}
                     name='remove'
                     color='red'
+                    reverse
                     onPress={()=>this.removePerson(index)}
                 />
-                <Text>{item.numberPersons}</Text>
+                <Text style={{color: 'white'}}>{item.numberPersons}</Text>
                 <Icon
                     size={20}
                     name='person'
-                    color='grey'
+                    color='white'
                 />
                 <Icon
-                    size={20}
+                    size={10}
                     name='add'
                     color='green'
+                    reverse
                     onPress={()=>this.addPerson(index)}
                 />
               </View>
               <View style={{flexDirection: 'column'}}>
-                <View style={{flexDirection: 'row'}}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Icon
-                      size={20}
+                      size={10}
+                      reverse
                       name='remove'
                       color='red'
                       onPress={()=>this.decreasePercentage(index)}
                   />
                   <Text>{item.tipPercentage} %</Text>
                   <Icon
-                      size={20}
+                      size={10}
+                      reverse
                       name='add'
                       color='green'
                       onPress={()=>this.increasePercentage(index)}
@@ -453,7 +465,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#3A4A4D',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     borderRadius: 3.6,
     shadowColor: "#000",
     shadowOffset: {
@@ -466,6 +477,10 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   itemTitle: {
+    justifyContent: 'space-between',
+    flex: 1,
+  },
+  itemTitleText: {
     fontSize: 20,
     padding: 4,
     color: '#bfc1c2',
