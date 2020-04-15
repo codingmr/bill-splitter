@@ -305,8 +305,8 @@ export default class GroupList extends React.Component {
               renderItem = {this.renderGroupItemInput}
               keyExtractor={(item, index) => 'item.id'+index}
           />
-          <View style={{alignItems: 'center'}}>
-            <Text style={{fontSize: 18}}>£{item.groupTotal}</Text>
+          <View style={{alignItems: 'flex-start', marginLeft: 22, marginTop: -5, marginBottom: 10}}>
+            <Text style={{fontSize: 18}}>= £{item.groupTotal}</Text>
           </View>
           <View style={styles.groupTotalBox}>
             <View style={{justifyContent: 'space-between', flexDirection: 'row', alignItems: 'flex-start'}}>
