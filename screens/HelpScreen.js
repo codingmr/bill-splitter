@@ -6,7 +6,7 @@ import { RectButton, ScrollView } from 'react-native-gesture-handler';
 
 export default function HelpScreen() {
   return (
-    <View style={}>
+    <View>
 
       <Text>1. Creating a new group</Text>
       // render create group button
@@ -30,7 +30,6 @@ export default function HelpScreen() {
 
       //  - Split the bill evenly
       //  - Split the bill unevenly
-      //  -  
 
     </View>
   );
